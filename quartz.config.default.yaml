@@ -1,13 +1,13 @@
 # yaml-language-server: $schema=./quartz/plugins/quartz-plugins.schema.json
 configuration:
-  pageTitle: Quartz 5
-  pageTitleSuffix: ""
+  pageTitle: QuKing's Blog
+  pageTitleSuffix: " | 数字花园"
   enableSPA: true
   enablePopovers: true
   analytics:
     provider: plausible
-  locale: en-US
-  baseUrl: quartz.jzhao.xyz
+  locale: zh-CN
+  baseUrl: monkeyass-byte.github.io/Blog
   ignorePatterns:
     - private
     - templates
