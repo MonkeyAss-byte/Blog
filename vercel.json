@@ -1,3 +1,9 @@
 {
-  "cleanUrls": true
+  "cleanUrls": true,
+  "rewrites": [
+    {
+      "source": "/((?!static/|images/|.*\\.(js|css|png|jpg|jpeg|gif|svg|ico|webp|woff|woff2|json|xml|txt)).*)",
+      "destination": "/index.html"
+    }
+  ]
 }
