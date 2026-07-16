@@ -7,7 +7,7 @@ configuration:
   analytics:
     provider: plausible
   locale: zh-CN
-  baseUrl: monkeyass-byte.github.io/Blog
+  baseUrl: blog-5na4cwvll-monkeyass-bytes-projects.vercel.app
   ignorePatterns:
     - private
     - templates
