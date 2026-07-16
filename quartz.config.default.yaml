@@ -7,7 +7,7 @@ configuration:
   analytics:
     provider: plausible
   locale: zh-CN
-  baseUrl: monkeyass-byte.github.io/Blog
+  baseUrl: monkeyass-byte.github.io
   ignorePatterns:
     - private
     - templates
