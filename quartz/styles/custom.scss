@@ -200,31 +200,38 @@ h1, h2, h3, h4, h5, h6, .page-title {
   opacity: 0.2; // Drop opacity further to reduce distraction
 }
 
+// Ensure the TOC active item doesn't light up during focus mode
+.page:has(.center:hover) .sidebar .toc ul li a.in-view {
+  opacity: 0.35 !important;
+}
+
 // --- 4. Viewport Edge Blur (Sticky gradient blur) ---
 // Blur whatever scrolls under the very top and very bottom of the screen
-.page::before, .page::after {
+#quartz-root::before, #quartz-root::after {
   content: "";
   position: fixed;
   left: 0; right: 0;
-  height: 60px;
-  z-index: 100;
+  height: 80px; // Taller to make the blur gradient more obvious
+  z-index: 99999;
   pointer-events: none;
+  // Chrome bug workaround: backdrop-filter needs a tiny background color to mask properly
+  background: rgba(255, 255, 255, 0.01);
 }
 
-.page::before {
+#quartz-root::before {
   top: 0;
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  mask-image: linear-gradient(to bottom, black 10%, transparent 100%);
-  -webkit-mask-image: linear-gradient(to bottom, black 10%, transparent 100%);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  mask-image: linear-gradient(to bottom, black 20%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to bottom, black 20%, transparent 100%);
 }
 
-.page::after {
+#quartz-root::after {
   bottom: 0;
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  mask-image: linear-gradient(to top, black 10%, transparent 100%);
-  -webkit-mask-image: linear-gradient(to top, black 10%, transparent 100%);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  mask-image: linear-gradient(to top, black 20%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to top, black 20%, transparent 100%);
 }
 
 // --- 5. Mobile Layout Optimization ---
