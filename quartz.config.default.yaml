@@ -16,30 +16,30 @@ configuration:
     fontOrigin: googleFonts
     cdnCaching: true
     typography:
-      header: IBM Plex Mono
-      body: IBM Plex Mono
-      code: IBM Plex Mono
+      header: Lora
+      body: Inter
+      code: JetBrains Mono
     colors:
       lightMode:
-        light: "#F5F6F7"
-        lightgray: "#E2E4E7"
-        gray: "#5A6572"
-        darkgray: "#24292E"
-        dark: "#1B1F23"
-        secondary: "#006622"
-        tertiary: "#0099B8"
-        highlight: "rgba(0, 102, 34, 0.08)"
-        textHighlight: "#00662222"
+        light: "#F3F3F5"
+        lightgray: "#D0D1DA"
+        gray: "#5C5D6E"
+        darkgray: "#1A1B1E"
+        dark: "#1A1B1E"
+        secondary: "#5C5FC9"
+        tertiary: "#7073D6"
+        highlight: "rgba(92, 95, 201, 0.10)"
+        textHighlight: "rgba(92, 95, 201, 0.20)"
       darkMode:
-        light: "#06090E"
-        lightgray: "#151E28"
-        gray: "#4F6072"
-        darkgray: "#C5D4E2"
-        dark: "#00FF5F"
-        secondary: "#00FF5F"
-        tertiary: "#00F2FE"
-        highlight: "rgba(0, 255, 95, 0.08)"
-        textHighlight: "#00ff5f33"
+        light: "#141417"
+        lightgray: "#2E2E3A"
+        gray: "#8B8C9E"
+        darkgray: "#E8E8F0"
+        dark: "#E8E8F0"
+        secondary: "#7B7EE8"
+        tertiary: "#9093F2"
+        highlight: "rgba(123, 126, 232, 0.12)"
+        textHighlight: "rgba(123, 126, 232, 0.24)"
 
 
 plugins:

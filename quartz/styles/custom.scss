@@ -1,114 +1,98 @@
 @use "./variables.scss" as *;
 
-// WebGL Fluid Simulation Background Integration
-#fluid-canvas {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  z-index: -2; // Put it behind everything including the main body
-  pointer-events: none;
-  background: transparent !important;
-}
+// Phase 1: Fluent Design Foundations - Background & Material System
 
-// Make body and root containers transparent so fluid canvas is visible
-body, #quartz-root, .page, .center {
-  background: transparent !important;
-}
-
-// Retro-terminal CRT scanlines (extremely subtle overlay)
+// 1. Geometric Dot Grid Background (Replaces WebGL Fluid)
 body::before {
   content: "";
-  display: block;
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(
-    rgba(18, 16, 16, 0) 50%, 
-    rgba(0, 0, 0, 0.1) 50%
-  );
-  background-size: 100% 4px;
-  z-index: 9999;
+  inset: 0;
+  z-index: -2;
+  background-image: radial-gradient(circle, var(--textHighlight) 1px, transparent 1px);
+  background-size: 24px 24px;
   pointer-events: none;
-  opacity: 0.15;
 }
 
-// Glow effect on headings and links
-h1, h2, h3, h4, h5, h6, .page-title a {
-  text-shadow: 0 0 4px var(--secondary);
-  font-family: 'IBM Plex Mono', monospace !important;
+// 2. Radial Gradient lighting from top-left
+body {
+  background: radial-gradient(ellipse at 15% 20%, var(--highlight) 0%, transparent 60%), var(--light) !important;
 }
 
-// Glow effect on links hover
-a.internal, a.external {
-  transition: text-shadow 0.3s ease, color 0.3s ease, border-bottom 0.3s ease;
-  font-family: 'IBM Plex Mono', monospace !important;
+// Make sure layout containers don't block the background
+#quartz-root, .page {
+  background: transparent !important;
+}
+
+// 3. Layer 1 — Mica Material (Main Content Area)
+.center {
+  background: color-mix(in srgb, var(--light) 72%, transparent) !important;
+  backdrop-filter: blur(40px) saturate(120%);
+  -webkit-backdrop-filter: blur(40px) saturate(120%);
+  border: 1px solid var(--lightgray);
+  border-top: 1px solid rgba(255, 255, 255, 0.15); // Inner Light edge
+  border-radius: 8px;
+  padding: 2rem;
+  margin-top: 2rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
   
-  &:hover {
-    text-shadow: 0 0 8px var(--secondary);
+  @media all and ($mobile) {
+    margin-top: 1rem;
+    padding: 1.2rem;
+    border-radius: 4px;
   }
 }
 
-// Custom prompt markers
-h1::before {
-  content: "$ ";
-  color: var(--secondary);
-  opacity: 0.8;
+// 4. Layer 2 — Acrylic Material (Sidebars & Popovers)
+.sidebar.left, .sidebar.right {
+  // Reset padding to manage inside acrylic containers
+  padding-left: 1rem;
+  padding-right: 1rem;
 }
 
-h2::before {
-  content: "> ";
-  color: var(--secondary);
-  opacity: 0.8;
-}
-
-h3::before {
-  content: "# ";
-  color: var(--secondary);
-  opacity: 0.8;
-}
-
-// Retro sharp console panels
-.explorer-container, .graph-outer, .backlinks, #quartz-sidebar, .popover {
-  background: color-mix(in srgb, var(--light) 90%, transparent) !important;
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid var(--lightgray) !important;
-  border-radius: 2px !important;
+// Target the actual components inside sidebar
+.sidebar .explorer, .sidebar .recent-notes, .sidebar .toc, .sidebar .backlinks, .popover {
+  background: color-mix(in srgb, var(--light) 52%, transparent) !important;
+  backdrop-filter: blur(64px) saturate(150%) brightness(1.04);
+  -webkit-backdrop-filter: blur(64px) saturate(150%) brightness(1.04);
+  border: 1px solid var(--lightgray);
+  border-top: 1px solid rgba(255, 255, 255, 0.15); // Inner Light edge
+  border-radius: 6px;
   padding: 1.2rem;
-  transition: border-color 0.3s ease, box-shadow 0.3s ease;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.5) !important;
-  
-  &:hover {
-    border-color: var(--secondary) !important;
-    box-shadow: 0 0 15px color-mix(in srgb, var(--secondary) 25%, transparent) !important;
-  }
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.10);
+  margin-bottom: 1rem;
+  transition: box-shadow 0.3s ease, border-color 0.3s ease;
 }
 
-// Geeky green retro scrollbar
+// Remove old retro borders from specific old custom selectors if they existed
+code, pre {
+  border: 1px solid var(--lightgray) !important;
+  border-radius: 4px !important;
+  background-color: color-mix(in srgb, var(--light) 60%, transparent) !important;
+}
+
+// Modern Scrollbar
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: var(--light);
+  background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: var(--secondary);
-  border-radius: 0px;
+  background: var(--lightgray);
+  border-radius: 3px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--tertiary);
+  background: var(--gray);
 }
 
-// Monospace tweaks
-code, pre {
-  border: 1px solid var(--lightgray) !important;
-  border-radius: 2px !important;
-  background-color: color-mix(in srgb, var(--light) 95%, transparent) !important;
+// Typography adjustments for the new fonts
+h1, h2, h3, h4, h5, h6 {
+  // Lora is a serif font, adjust tracking
+  letter-spacing: -0.02em;
 }
 
-
+// Smooth transitions for theme switching
+* {
+  transition: background-color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+}
