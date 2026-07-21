@@ -233,7 +233,7 @@ body:has(.center:hover) .edge-blur-layer {
 // --- 5. Mobile Layout Optimization ---
 @media all and ($mobile) {
   html, body {
-    overflow-x: hidden; // Prevent horizontal scrollbars when cards scale up
+    overflow-x: hidden; // Prevent horizontal scrollbars
   }
 
   // Ensure header doesn't stick to the content
@@ -241,23 +241,41 @@ body:has(.center:hover) .edge-blur-layer {
     margin-bottom: 2rem !important;
   }
 
-  // 1. Give the main layout more breathing room vertically
+  // --- Mobile Dashboard Mode (3-column layout) ---
+  // The user explicitly requested the Desktop layout on mobile, relying on "tap to focus" to read.
   #quartz-body {
-    row-gap: 2.5rem !important; // Spread out the major sections (header, center, sidebars)
-    padding: 0 0.8rem !important; // Slight outer margin
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: flex-start !important;
+    gap: 0.5rem !important;
+    padding: 0 0.5rem !important;
   }
   
-  // 2. Make the center reading card more comfortable
-  .center {
-    padding: 2.5rem 1.5rem !important; // Increase internal padding so text isn't crammed to the borders
-    border-radius: 16px !important; // More rounded, premium feel
-  }
-  
-  // 3. Spread out the sidebar component cards
-  // Force BOTH sidebars to be vertical stacks (tiled)
-  .sidebar.left, .sidebar.right {
+  .sidebar.left {
+    flex: 1 !important;
+    order: 1 !important;
+    display: flex !important;
     flex-direction: column !important;
-    align-items: stretch !important;
+    position: static !important;
+    height: auto !important;
+    padding: 0 !important;
+  }
+  
+  .center {
+    flex: 2 !important;
+    order: 2 !important;
+    padding: 1rem 0.8rem !important;
+    margin-top: 0 !important;
+    border-radius: 8px !important;
+  }
+  
+  .sidebar.right {
+    flex: 1 !important;
+    order: 3 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    position: static !important;
+    height: auto !important;
     padding: 0 !important;
   }
   
@@ -271,49 +289,71 @@ body:has(.center:hover) .edge-blur-layer {
     opacity: 1 !important;
     visibility: visible !important;
     max-height: none !important;
-    margin-top: 1rem;
+    margin-top: 0 !important;
   }
   
-  // Apply nice card padding to everything except header tools
-  .sidebar.left > .explorer, .sidebar.right > *, .center, .popover {
-    padding: 1.5rem !important;
-    border-radius: 16px !important;
-    margin-bottom: 1.5rem !important; 
+  // Apply card styling to sidebars, scaled down for dashboard view
+  .sidebar.left > .explorer, .sidebar.right > *, .popover {
+    padding: 0.8rem !important;
+    border-radius: 8px !important;
+    margin-bottom: 0.8rem !important; 
     width: 100% !important;
     box-sizing: border-box !important;
   }
 
-  // 4. Spread out typography (text isn't jammed together)
+  // Scale down typography for the dashboard view
   .markdown-rendered {
-    p, li {
-      line-height: 1.8 !important;
-      margin-bottom: 1.2rem !important;
-    }
-    h1 { font-size: 2rem !important; margin-bottom: 1.5rem !important; }
-    h2 { font-size: 1.6rem !important; margin-top: 2.5rem !important; margin-bottom: 1.2rem !important; }
-    h3 { font-size: 1.4rem !important; margin-top: 2rem !important; margin-bottom: 1rem !important; }
+    font-size: 0.6rem !important;
+    p, li { line-height: 1.5 !important; margin-bottom: 0.5rem !important; }
+    h1 { font-size: 1.2rem !important; margin-bottom: 0.5rem !important; }
+    h2 { font-size: 1rem !important; margin-top: 1rem !important; margin-bottom: 0.5rem !important; }
+    h3 { font-size: 0.8rem !important; margin-top: 1rem !important; margin-bottom: 0.5rem !important; }
   }
 
-  // 5. Mobile Tap-to-Focus States
-  // When ANY block is focused on mobile, blur the un-focused ones
+  // --- Mobile Focus Modal ---
+  // When ANY block is focused on mobile, make it a massive screen-filling modal!
   .page.has-mobile-focus .center:not(.mobile-focused),
   .page.has-mobile-focus .sidebar > *:not(.mobile-focused),
   .page.has-mobile-focus footer {
     opacity: 0.3 !important;
-    filter: blur(4px) grayscale(50%) !important;
+    filter: blur(8px) grayscale(50%) !important;
     transition: opacity 0.4s ease, filter 0.4s ease !important;
   }
 
-  // The focused block itself
+  // The focused block itself pops out
   .mobile-focused {
-    transform: scale(1.02) !important;
-    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.2) !important;
-    z-index: 50 !important;
-    transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.4s ease !important;
+    position: fixed !important;
+    top: 5% !important;
+    left: 5% !important;
+    width: 90% !important;
+    height: 90% !important;
+    z-index: 9999 !important;
+    overflow-y: auto !important;
+    transform: none !important; // Don't scale, just resize
+    box-shadow: 0 20px 80px rgba(0,0,0,0.8) !important;
+    padding: 2rem 1.5rem !important;
+    border-radius: 16px !important;
+    margin: 0 !important;
+    
+    // Restore readable font size inside the focused modal
+    &.center, &, & .markdown-rendered {
+      font-size: 1rem !important;
+      p, li { line-height: 1.8 !important; margin-bottom: 1.2rem !important; }
+      h1 { font-size: 2rem !important; margin-bottom: 1.5rem !important; }
+      h2 { font-size: 1.6rem !important; margin-top: 2.5rem !important; margin-bottom: 1.2rem !important; }
+      h3 { font-size: 1.4rem !important; margin-top: 2rem !important; margin-bottom: 1rem !important; }
+    }
   }
   
   // Base transition for all cards
   .center, .sidebar > * {
-    transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.4s ease, opacity 0.4s ease, filter 0.4s ease !important;
+    transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1), 
+                box-shadow 0.4s ease, 
+                opacity 0.4s ease, 
+                filter 0.4s ease,
+                width 0.4s ease,
+                height 0.4s ease,
+                top 0.4s ease,
+                left 0.4s ease !important;
   }
 }

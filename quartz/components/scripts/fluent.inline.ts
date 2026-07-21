@@ -73,45 +73,16 @@ function setupMobileInteraction() {
   const page = document.querySelector(".page") as HTMLElement;
   if (!page) return;
 
-  // Variables to track swipe
-  let touchStartY = 0;
-  let isScrolling = false;
-
-  // Global listener to dismiss focus when tapping outside
-  document.addEventListener("touchstart", (e) => {
-    // If we click outside any card, remove focus from all
-    const target = e.target as Node;
-    let clickedInsideCard = false;
-    cards.forEach(card => {
-      if (card.contains(target)) clickedInsideCard = true;
-    });
-
-    if (!clickedInsideCard) {
-      cards.forEach(c => c.classList.remove("mobile-focused"));
-      page.classList.remove("has-mobile-focus");
-    }
-  }, { passive: true });
-
+  // We use 'click' instead of touch events because modern mobile browsers perfectly differentiate 
+  // between a swipe/scroll and a true 'tap' (click), making this 100% reliable.
   for (const card of cards) {
-    if (card.dataset.mobileFocusInit) continue;
-    card.dataset.mobileFocusInit = "true";
-
-    card.addEventListener("touchstart", (e: TouchEvent) => {
-      touchStartY = e.touches[0].clientY;
-      isScrolling = false;
-    }, { passive: true });
-
-    card.addEventListener("touchmove", (e: TouchEvent) => {
-      const touchY = e.touches[0].clientY;
-      if (Math.abs(touchY - touchStartY) > 20) { // Increased threshold to avoid fat-finger misfires
-        isScrolling = true; // User is swiping/scrolling
+    card.addEventListener("click", (e: Event) => {
+      // Don't trigger if they clicked a link or button
+      const target = e.target as HTMLElement;
+      if (target.tagName.toLowerCase() === "a" || target.closest("a") || target.closest("button")) {
+        return; 
       }
-    }, { passive: true });
 
-    card.addEventListener("touchend", (e: TouchEvent) => {
-      if (isScrolling) return; // Filter out swipes
-
-      // It's a clean tap!
       const isAlreadyFocused = card.classList.contains("mobile-focused");
       
       // Remove focus from all cards first
@@ -124,20 +95,18 @@ function setupMobileInteraction() {
         // Toggle on
         card.classList.add("mobile-focused");
         page.classList.add("has-mobile-focus");
-        // Optional: scroll slightly to center it
-        // card.scrollIntoView({ behavior: "smooth", block: "center" });
       }
     });
   }
 
   // Clear focus when tapping outside any card
-  document.addEventListener("touchend", (e: TouchEvent) => {
+  document.addEventListener("click", (e: Event) => {
     const target = e.target as HTMLElement;
     if (!target.closest(".center") && !target.closest(".sidebar > *")) {
       cards.forEach(c => c.classList.remove("mobile-focused"));
       page.classList.remove("has-mobile-focus");
     }
-  }, { passive: true });
+  });
 }
 
 // --- 5. Dark Mode View Transition Hack ---
@@ -188,8 +157,8 @@ function setupEdgeBlur() {
   topDiv.className = "edge-blur-layer top";
   topDiv.style.top = "0";
   topDiv.style.height = "100px";
-  topDiv.style.backdropFilter = "blur(12px)";
-  topDiv.style.webkitBackdropFilter = "blur(12px)";
+  topDiv.style.backdropFilter = "blur(12px) brightness(0.85)";
+  topDiv.style.webkitBackdropFilter = "blur(12px) brightness(0.85)";
   topDiv.style.maskImage = "linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 100%)";
   topDiv.style.webkitMaskImage = "linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 100%)";
   
@@ -197,8 +166,8 @@ function setupEdgeBlur() {
   bottomDiv.className = "edge-blur-layer bottom";
   bottomDiv.style.bottom = "0";
   bottomDiv.style.height = "100px";
-  bottomDiv.style.backdropFilter = "blur(12px)";
-  bottomDiv.style.webkitBackdropFilter = "blur(12px)";
+  bottomDiv.style.backdropFilter = "blur(12px) brightness(0.85)";
+  bottomDiv.style.webkitBackdropFilter = "blur(12px) brightness(0.85)";
   bottomDiv.style.maskImage = "linear-gradient(to top, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 100%)";
   bottomDiv.style.webkitMaskImage = "linear-gradient(to top, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 100%)";
   
