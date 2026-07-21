@@ -230,53 +230,6 @@ body:has(.center:hover) .edge-blur-layer {
     margin-bottom: 2rem !important;
   }
 
-  // --- Mobile Simple Top-to-Bottom Stack ---
-  // We use the simplest flex column layout to naturally fit the phone screen px without any squeezing
-  html, body, .page {
-    width: 100% !important;
-    max-width: 100vw !important;
-    min-width: 0 !important;
-    overflow-x: hidden !important;
-    margin: 0 !important;
-  }
-  
-  #quartz-body {
-    display: flex !important;
-    flex-direction: column !important;
-    width: 100% !important;
-    max-width: 100vw !important;
-    box-sizing: border-box !important;
-    gap: 1.5rem !important;
-    padding: 1rem !important;
-    margin: 0 !important;
-  }
-  
-  .sidebar.right {
-    display: none !important;
-  }
-  
-  .sidebar.left, .center {
-    display: flex !important;
-    flex-direction: column !important;
-    width: 100% !important;
-    box-sizing: border-box !important;
-    padding: 1.5rem !important;
-    border-radius: 12px !important;
-    margin: 0 !important;
-  }
-  
-  // Restore native Explorer dropdown on mobile, but make it static to push content down instead of overlapping!
-  .explorer-content {
-    position: static !important;
-    box-shadow: none !important;
-    border: none !important;
-    width: 100% !important;
-  }
-  
-  .sidebar.left > .explorer, .sidebar.right > *, .popover {
-    width: 100% !important;
-    box-sizing: border-box !important;
-  }
 
   // Restore typography to normal readable sizes for a vertical layout
   .markdown-rendered {

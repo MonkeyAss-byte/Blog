@@ -173,10 +173,13 @@ function setupEdgeBlur() {
     div.style.backdropFilter = "blur(6px)";
     div.style.webkitBackdropFilter = "blur(6px)";
     
-    // Solid color gradient to fade out text without creating a "black gradient" look,
-    // matching standard UI conventions for fading into the page background.
+    // FADE THE BLUR ITSELF using a mask (fixes the "hard line" issue)
     const direction = isTop ? "to bottom" : "to top";
-    div.style.background = `linear-gradient(${direction}, var(--light) 10%, transparent 100%)`;
+    div.style.maskImage = `linear-gradient(${direction}, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 100%)`;
+    div.style.webkitMaskImage = `linear-gradient(${direction}, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 100%)`;
+    
+    // FADE THE TEXT to the background color (fixes the "black gradient" issue)
+    div.style.background = `linear-gradient(${direction}, var(--light) 20%, transparent 100%)`;
     
     return div;
   };
