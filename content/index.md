@@ -35,8 +35,6 @@ MonkeyAss-byte，图形渲染与游戏开发方向。
 
 ---
 
-## 最近更新
-
 ## 技术栈
 
 <div style="display: flex; flex-wrap: wrap; gap: 0.5rem;">
