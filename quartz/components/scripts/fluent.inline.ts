@@ -129,6 +129,15 @@ function setupMobileInteraction() {
       }
     });
   }
+
+  // Clear focus when tapping outside any card
+  document.addEventListener("touchend", (e: TouchEvent) => {
+    const target = e.target as HTMLElement;
+    if (!target.closest(".center") && !target.closest(".sidebar > *")) {
+      cards.forEach(c => c.classList.remove("mobile-focused"));
+      page.classList.remove("has-mobile-focus");
+    }
+  }, { passive: true });
 }
 
 // --- 5. Dark Mode View Transition Hack ---
@@ -176,7 +185,7 @@ function setupEdgeBlur() {
   if (window.innerWidth <= 768) return;
 
   const topDiv = document.createElement("div");
-  topDiv.className = "edge-blur-layer";
+  topDiv.className = "edge-blur-layer top";
   topDiv.style.top = "0";
   topDiv.style.height = "100px";
   topDiv.style.backdropFilter = "blur(12px)";
@@ -185,7 +194,7 @@ function setupEdgeBlur() {
   topDiv.style.webkitMaskImage = "linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 100%)";
   
   const bottomDiv = document.createElement("div");
-  bottomDiv.className = "edge-blur-layer";
+  bottomDiv.className = "edge-blur-layer bottom";
   bottomDiv.style.bottom = "0";
   bottomDiv.style.height = "100px";
   bottomDiv.style.backdropFilter = "blur(12px)";

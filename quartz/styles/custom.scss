@@ -217,6 +217,14 @@ h1, h2, h3, h4, h5, h6, .page-title {
   transition: opacity 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
+.edge-blur-layer.top {
+  background: linear-gradient(to bottom, color-mix(in srgb, var(--light) 80%, transparent) 0%, transparent 100%);
+}
+
+.edge-blur-layer.bottom {
+  background: linear-gradient(to top, color-mix(in srgb, var(--light) 80%, transparent) 0%, transparent 100%);
+}
+
 // Show the edge blur ONLY when the center block is hovered (Focus Mode)
 body:has(.center:hover) .edge-blur-layer {
   opacity: 1;
@@ -246,17 +254,31 @@ body:has(.center:hover) .edge-blur-layer {
   }
   
   // 3. Spread out the sidebar component cards
-  // ONLY for the right sidebar so we don't break the top header (which is in sidebar.left)
-  .sidebar.right {
-    flex-direction: column !important; // FIX: Prevent horizontal squeezing
+  // Force BOTH sidebars to be vertical stacks (tiled)
+  .sidebar.left, .sidebar.right {
+    flex-direction: column !important;
+    align-items: stretch !important;
     padding: 0 !important;
   }
   
-  // Exclude .explorer from these heavy card styles on mobile so the hamburger menu stays neat
-  .sidebar.right > *, .center, .popover {
+  // Force the explorer to be flat and visible (no hamburger dropdown needed)
+  .explorer-toggle {
+    display: none !important;
+  }
+  .explorer-content {
+    display: block !important;
+    position: static !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    max-height: none !important;
+    margin-top: 1rem;
+  }
+  
+  // Apply nice card padding to everything except header tools
+  .sidebar.left > .explorer, .sidebar.right > *, .center, .popover {
     padding: 1.5rem !important;
     border-radius: 16px !important;
-    margin-bottom: 1.5rem !important; // More space between each sidebar card
+    margin-bottom: 1.5rem !important; 
     width: 100% !important;
     box-sizing: border-box !important;
   }
