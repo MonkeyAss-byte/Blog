@@ -183,6 +183,7 @@ h1, h2, h3, h4, h5, h6, .page-title {
 }
 
 // Hide duplicated H1 title from Markdown body (since Quartz renders the page title)
-article > h1:first-of-type {
-  display: none;
+.center > h1:first-of-type,
+.center > .popover-hint > h1:first-of-type {
+  display: none !important;
 }
