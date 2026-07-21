@@ -206,60 +206,24 @@ h1, h2, h3, h4, h5, h6, .page-title {
   opacity: 0.35 !important;
 }
 
-// --- 4. Viewport Edge Blur (Sticky gradient blur) ---
-// Blur whatever scrolls under the very top and very bottom of the screen
-html::before, html::after {
-  content: "";
+// --- 4. Viewport Edge Blur (Stepped DIVs fallback) ---
+// These classes are injected via JS because mask-image backdrop-filter is bugged on some Chromium builds
+.edge-blur-layer {
   position: fixed;
   left: 0; right: 0;
-  height: 100px; // Taller to make the blur gradient more obvious
-  z-index: 999999; // Absolute top
+  z-index: 999999;
   pointer-events: none;
-  // Chrome bug workaround: backdrop-filter needs a tiny background color to mask properly
-  background: rgba(120, 120, 120, 0.01);
-  transform: translateZ(0); // Force hardware compositing to fix mask-image backdrop-filter bug
-}
-
-html::before {
-  top: 0;
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  mask-image: linear-gradient(to bottom, black 20%, transparent 100%);
-  -webkit-mask-image: linear-gradient(to bottom, black 20%, transparent 100%);
-}
-
-html::after {
-  bottom: 0;
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  mask-image: linear-gradient(to top, black 20%, transparent 100%);
-  -webkit-mask-image: linear-gradient(to top, black 20%, transparent 100%);
-}
-
-// --- 5. View Transitions for Dark Mode ---
-::view-transition-old(root),
-::view-transition-new(root) {
-  animation: none;
-  mix-blend-mode: normal;
-}
-::view-transition-old(root) {
-  z-index: 1;
-}
-::view-transition-new(root) {
-  z-index: 2;
-}
-/* When switching to light mode, animate the old view collapsing instead */
-:root[saved-theme="light"]::view-transition-old(root) {
-  z-index: 2;
-}
-:root[saved-theme="light"]::view-transition-new(root) {
-  z-index: 1;
 }
 
 // --- 5. Mobile Layout Optimization ---
 @media all and ($mobile) {
   html, body {
     overflow-x: hidden; // Prevent horizontal scrollbars when cards scale up
+  }
+
+  // Ensure header doesn't stick to the content
+  .page-header {
+    margin-bottom: 2rem !important;
   }
 
   // 1. Give the main layout more breathing room vertically

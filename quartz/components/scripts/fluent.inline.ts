@@ -163,38 +163,56 @@ function setupDarkmodeTransition() {
     const endRadius = Math.hypot(Math.max(x, window.innerWidth - x), Math.max(y, window.innerHeight - y));
 
     const transition = document.startViewTransition(() => applyTheme());
-
-    transition.ready.then(() => {
-      const clipPath = [
-        `circle(0px at ${x}px ${y}px)`,
-        `circle(${endRadius}px at ${x}px ${y}px)`
-      ];
-      document.documentElement.animate(
-        {
-          clipPath: newTheme === "dark" ? clipPath : clipPath.slice().reverse(),
-        },
-        {
-          duration: 600,
-          easing: "ease-in-out",
-          pseudoElement: newTheme === "dark" ? "::view-transition-new(root)" : "::view-transition-old(root)",
-        }
-      );
-    });
+    // No explicit clip-path animation here, so it will fall back to a beautiful, soft cross-fade default!
   });
+}
+
+// --- 6. Robust Viewport Edge Blur (Stepped DIVs) ---
+// This guarantees a gradient blur on ALL browsers, bypassing the Chromium mask-image bug
+function setupEdgeBlur() {
+  if (document.querySelector(".edge-blur-layer")) return; // Already setup
+
+  const steps = 5;
+  const height = 80; // Total height of the blur gradient
+
+  for (let i = 0; i < steps; i++) {
+    const fraction = (i + 1) / steps;
+    // Top blur layer
+    const topDiv = document.createElement("div");
+    topDiv.className = "edge-blur-layer";
+    topDiv.style.top = `${i * (height / steps)}px`;
+    topDiv.style.height = `${height / steps}px`;
+    topDiv.style.backdropFilter = `blur(${fraction * 12}px)`;
+    topDiv.style.webkitBackdropFilter = `blur(${fraction * 12}px)`;
+    
+    // Bottom blur layer
+    const bottomDiv = document.createElement("div");
+    bottomDiv.className = "edge-blur-layer";
+    bottomDiv.style.bottom = `${i * (height / steps)}px`;
+    bottomDiv.style.height = `${height / steps}px`;
+    bottomDiv.style.backdropFilter = `blur(${fraction * 12}px)`;
+    bottomDiv.style.webkitBackdropFilter = `blur(${fraction * 12}px)`;
+    
+    document.body.appendChild(topDiv);
+    document.body.appendChild(bottomDiv);
+  }
 }
 
 document.addEventListener("nav", () => {
   setupFluentMotion();
   setupMobileInteraction();
   setupDarkmodeTransition();
+  setupEdgeBlur();
 });
 window.addEventListener("DOMContentLoaded", () => {
   setupFluentMotion();
   setupMobileInteraction();
   setupDarkmodeTransition();
+  setupEdgeBlur();
 });
 // Run once immediately in case DOM is already loaded
 setupFluentMotion();
 setupMobileInteraction();
 setupDarkmodeTransition();
+setupEdgeBlur();
 
