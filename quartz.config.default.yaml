@@ -7,7 +7,7 @@ configuration:
   analytics:
     provider: plausible
   locale: zh-CN
-  baseUrl: monkeyass-byte.github.io/Blog
+  baseUrl: monkeyass.homes
   ignorePatterns:
     - private
     - templates
@@ -116,7 +116,7 @@ plugins:
   - source: github:quartz-community/og-image
     enabled: true
   - source: github:quartz-community/cname
-    enabled: false
+    enabled: true
   - source: github:quartz-community/canvas-page
     enabled: true
   - source: github:quartz-community/content-page
