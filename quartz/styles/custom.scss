@@ -265,19 +265,12 @@ body:has(.center:hover) .edge-blur-layer {
     margin: 0 !important;
   }
   
-  // Force the explorer to be flat
-
-  .explorer-toggle {
-    display: none !important;
-  }
+  // Restore native Explorer dropdown on mobile, but make it static to push content down instead of overlapping!
   .explorer-content {
-    display: block !important;
     position: static !important;
-    opacity: 1 !important;
-    visibility: visible !important;
-    max-height: none !important;
-    margin-top: 0 !important;
-    padding: 0 !important;
+    box-shadow: none !important;
+    border: none !important;
+    width: 100% !important;
   }
   
   .sidebar.left > .explorer, .sidebar.right > *, .popover {

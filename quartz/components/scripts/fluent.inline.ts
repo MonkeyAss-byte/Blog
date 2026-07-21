@@ -66,6 +66,11 @@ function setupFluentMotion() {
 
 // --- 4. Mobile Tap-to-Focus Interaction ---
 function setupMobileInteraction() {
+  // Mobile click-to-expand has been explicitly disabled per user request.
+  if (window.innerWidth <= 768) {
+    return;
+  }
+
   const cards = document.querySelectorAll(
     ".center, .sidebar .explorer, .sidebar .recent-notes, .sidebar .toc, .sidebar .backlinks, .popover"
   ) as NodeListOf<HTMLElement>;
@@ -160,18 +165,18 @@ function setupEdgeBlur() {
     div.style[isTop ? "top" : "bottom"] = "0";
     div.style.left = "0";
     div.style.right = "0";
-    div.style.height = "80px"; // Closer to edge
+    div.style.height = "150px"; // Expanded range
     div.style.pointerEvents = "none";
     div.style.zIndex = "999999";
     
-    // Pure blur without brightness/grayscale to prevent the "black gradient" look
-    div.style.backdropFilter = "blur(10px)";
-    div.style.webkitBackdropFilter = "blur(10px)";
+    // Soft blur intensity
+    div.style.backdropFilter = "blur(6px)";
+    div.style.webkitBackdropFilter = "blur(6px)";
     
-    // Softer gradient fade
+    // Solid color gradient to fade out text without creating a "black gradient" look,
+    // matching standard UI conventions for fading into the page background.
     const direction = isTop ? "to bottom" : "to top";
-    div.style.maskImage = `linear-gradient(${direction}, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 100%)`;
-    div.style.webkitMaskImage = `linear-gradient(${direction}, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 100%)`;
+    div.style.background = `linear-gradient(${direction}, var(--light) 10%, transparent 100%)`;
     
     return div;
   };
