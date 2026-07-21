@@ -93,7 +93,7 @@ For each vertex:
 | **UV4** | `.x` | SH 系数 8（$Y_8$） |
 | **UV4** | `.y` | 顶点曲率（curvature，用于 SSS LUT） |
 
-> **关键设计**：使用 `float4` 类型（TEXCOORD1/2/3）接收数据，而非 Unity 传统的 `COLOR` 通道（8-bit），保证了 32-bit 全精度，避免 SH 系数量化误差。
+>**关键设计**：使用 `float4` 类型（TEXCOORD1/2/3）接收数据，而非 Unity 传统的 `COLOR` 通道（8-bit），保证了 32-bit 全精度，避免 SH 系数量化误差。
 
 ### 1.4 GPU 投影核心
 
@@ -161,7 +161,7 @@ LUT 布局: 128×128
   3. 归一化: result / totalWeight
 ```
 
-> **设计思想**：只烘焙物理基准距离 `d=1.0` 的单通道灰度 LUT。运行时在 Shader 中对 RGB 三通道分别采样：`curvature × ScatterRadius.rgb × ScatterScale`，实现免重复烘焙的万能体积散射。
+>**设计思想**：只烘焙物理基准距离 `d=1.0` 的单通道灰度 LUT。运行时在 Shader 中对 RGB 三通道分别采样：`curvature × ScatterRadius.rgb × ScatterScale`，实现免重复烘焙的万能体积散射。
 
 ### 2.3 相关文件
 

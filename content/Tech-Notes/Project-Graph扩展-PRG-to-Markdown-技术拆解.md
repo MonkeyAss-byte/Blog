@@ -13,7 +13,7 @@ description: Project Graph 扩展 "PRG to Markdown (with Pic)" 的完整技术�
 
 # Project Graph 扩展开发 - PRG to Markdown 技术拆解
 
-> 📊 将 `.prg` 工程文件导出为 Markdown（含内嵌图片），零外部依赖
+> 将 `.prg` 工程文件导出为 Markdown（含内嵌图片），零外部依赖
 
 ---
 
@@ -193,7 +193,7 @@ function collectNestedNodes(root: unknown[], existingNodes: Map<string, RawNode>
 
 ### 4.2 关键去重逻辑
 
-**边标签与目标节点同名 → 跳过 `> 💬` 行：**
+**边标签与目标节点同名 → 跳过 `> ` 行：**
 
 ```typescript
 // 边标签 "半投影" == Section.text "半投影" → 不重复显示

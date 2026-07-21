@@ -10,7 +10,7 @@ description: Project Graph 扩展 PRG to Markdown (with Pic) v0.2.0 的技术拆
 
 # Project Graph 扩展 - PRG to Markdown (with Pic)
 
-## 📦 基本信息
+## 基本信息
 
 | 属性 | 值 |
 |------|-----|
@@ -22,7 +22,7 @@ description: Project Graph 扩展 PRG to Markdown (with Pic) v0.2.0 的技术拆
 | **源文件** | `com.monkeyass-byte.prg-to-md-with-pic.prg` |
 | **包大小** | 38.9 KB |
 
-## 📂 包内容
+## 包内容
 
 | 文件 | 大小 | 说明 |
 |------|------|------|
@@ -30,7 +30,7 @@ description: Project Graph 扩展 PRG to Markdown (with Pic) v0.2.0 的技术拆
 | `metadata.msgpack` | 243 B | 扩展元数据（ID/名称/版本） |
 | `README.md` | 954 B | 扩展说明文档 |
 
-## 🔍 源码概览
+## 源码概览
 
 - **大小**：120.6 KB
 - **行数**：29 行
@@ -64,40 +64,69 @@ jszip/dist/jszip.min.js:
 ... (共 29 行)
 ```
 
-## 📖 扩展说明（README）
+## 扩展说明（README）
 
-# PRG to Markdown (with Pic)
-
-将当前打开的 `.prg` 工程文件导出为 Markdown（含内嵌图片），一键复制到剪贴板。
-
-## 功能
-
-- 解析所有节点：TextNode、Section、ImageNode、UrlNode、LatexNode、ExtensionEntity 等
-- 递归提取边内嵌节点和层级关系
-- 解析所有连线：LineEdge、ArcEdge、CubicCatmullRomSplineEdge、MultiTargetUndirectedEdge
-- 包含关系用 `#` 标题层级，边连接用 `-` 缩进列表
-- 图片内嵌为 base64 引用
-- 零外部依赖（PowerShell 读文件 + JS 解析）
-
-## 使用方式
-
-1. 安装扩展，**重启 Project Graph**
-2. 打开 `.prg` 工程，依次按 **`m` → `n` → `f`**
-3. Markdown 自动复制到剪贴板
-
-## 开发
-
-```bash
-npm install
-npm run build          # 构建
-npm run install:ext    # 安装到本地 Project Graph
-npm run package        # 打包为 .prg
-```
-
-产物：`out/com.monkeyass-byte.prg-to-md-with-pic.prg`
+# PRG to Markdown (with Pic)
 
 
-## 🧾 完整元数据
+
+将当前打开的 `.prg` 工程文件导出为 Markdown（含内嵌图片），一键复制到剪贴板。
+
+
+
+## 功能
+
+
+
+- 解析所有节点：TextNode、Section、ImageNode、UrlNode、LatexNode、ExtensionEntity 等
+
+- 递归提取边内嵌节点和层级关系
+
+- 解析所有连线：LineEdge、ArcEdge、CubicCatmullRomSplineEdge、MultiTargetUndirectedEdge
+
+- 包含关系用 `#` 标题层级，边连接用 `-` 缩进列表
+
+- 图片内嵌为 base64 引用
+
+- 零外部依赖（PowerShell 读文件 + JS 解析）
+
+
+
+## 使用方式
+
+
+
+1. 安装扩展，**重启 Project Graph**
+
+2. 打开 `.prg` 工程，依次按 **`m` → `n` → `f`**
+
+3. Markdown 自动复制到剪贴板
+
+
+
+## 开发
+
+
+
+```bash
+
+npm install
+
+npm run build          # 构建
+
+npm run install:ext    # 安装到本地 Project Graph
+
+npm run package        # 打包为 .prg
+
+```
+
+
+
+产物：`out/com.monkeyass-byte.prg-to-md-with-pic.prg`
+
+
+
+## 完整元数据
 
 ```json
 {
@@ -110,7 +139,7 @@ npm run package        # 打包为 .prg
 }
 ```
 
-## 🚀 安装方法
+## 安装方法
 
 1. 将 `{os.path.basename(prg_path)}` 放入 Project Graph 扩展目录：
    `%APPDATA%/liren.project-graph/extensions/com.monkeyass-byte.prg-to-md-with-pic/`
