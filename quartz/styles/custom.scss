@@ -236,16 +236,33 @@ h1, h2, h3, h4, h5, h6, .page-title {
 
 // --- 5. Mobile Layout Optimization ---
 @media all and ($mobile) {
+  // 1. Give the main layout more breathing room vertically
   #quartz-body {
-    padding: 0 0.5rem !important; // Reduce outer gap
+    row-gap: 2.5rem !important; // Spread out the major sections (header, center, sidebars)
+    padding: 0 0.8rem !important; // Slight outer margin
   }
   
+  // 2. Make the center reading card more comfortable
+  .center {
+    padding: 2.5rem 1.5rem !important; // Increase internal padding so text isn't crammed to the borders
+    border-radius: 16px !important; // More rounded, premium feel
+  }
+  
+  // 3. Spread out the sidebar component cards
   .sidebar .explorer, .sidebar .recent-notes, .sidebar .toc, .sidebar .backlinks, .popover {
-    padding: 1rem !important;
-    border-radius: 12px !important;
+    padding: 1.5rem !important;
+    border-radius: 16px !important;
+    margin-bottom: 1.5rem !important; // More space between each sidebar card
   }
 
-  // Adjust typography for mobile
-  h1 { font-size: 1.75rem !important; }
-  h2 { font-size: 1.4rem !important; }
+  // 4. Spread out typography (text isn't jammed together)
+  .markdown-rendered {
+    p, li {
+      line-height: 1.8 !important;
+      margin-bottom: 1.2rem !important;
+    }
+    h1 { font-size: 2rem !important; margin-bottom: 1.5rem !important; }
+    h2 { font-size: 1.6rem !important; margin-top: 2.5rem !important; margin-bottom: 1.2rem !important; }
+    h3 { font-size: 1.4rem !important; margin-top: 2rem !important; margin-bottom: 1rem !important; }
+  }
 }
