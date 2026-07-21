@@ -159,49 +159,29 @@ function setupEdgeBlur() {
   if (window.innerWidth <= 768) return;
 
   const createSmoothBlur = (isTop: boolean) => {
-    const container = document.createElement("div");
-    container.className = `edge-blur-layer ${isTop ? "top" : "bottom"}`;
-    container.style.position = "fixed";
-    container.style[isTop ? "top" : "bottom"] = "0";
-    container.style.left = "0";
-    container.style.right = "0";
-    container.style.height = "150px";
-    container.style.pointerEvents = "none";
-    container.style.zIndex = "999999";
+    const div = document.createElement("div");
+    div.className = `edge-blur-layer ${isTop ? "top" : "bottom"}`;
+    div.style.position = "fixed";
+    div.style[isTop ? "top" : "bottom"] = "0";
+    div.style.left = "0";
+    div.style.right = "0";
+    div.style.height = "150px"; // Expanded range
+    div.style.pointerEvents = "none";
+    div.style.zIndex = "999999";
     
-    // Instead of mask-image (which breaks backdrop-filter in some Chromium builds),
-    // we use a stepped blur approach with 5 layers to create a smooth distance field blur!
-    const steps = 5;
-    for (let i = 0; i < steps; i++) {
-      const stepDiv = document.createElement("div");
-      stepDiv.style.position = "absolute";
-      stepDiv.style[isTop ? "top" : "bottom"] = "0";
-      stepDiv.style.left = "0";
-      stepDiv.style.right = "0";
-      // Each layer is shorter than the previous, creating a gradient of blur intensity
-      stepDiv.style.height = `${100 - (i * (100 / steps))}%`;
-      
-      // Pure blur, increasing as it gets closer to the edge
-      const blurAmount = (i + 1) * 3; // 3px, 6px, 9px, 12px, 15px
-      stepDiv.style.backdropFilter = `blur(${blurAmount}px)`;
-      stepDiv.style.webkitBackdropFilter = `blur(${blurAmount}px)`;
-      
-      container.appendChild(stepDiv);
-    }
+    // Stronger blur intensity
+    div.style.backdropFilter = "blur(16px)";
+    div.style.webkitBackdropFilter = "blur(16px)";
     
-    // Top layer: Solid color gradient to fade out text
-    const gradientDiv = document.createElement("div");
-    gradientDiv.style.position = "absolute";
-    gradientDiv.style.top = "0";
-    gradientDiv.style.bottom = "0";
-    gradientDiv.style.left = "0";
-    gradientDiv.style.right = "0";
+    // FADE THE BLUR ITSELF using a mask
     const direction = isTop ? "to bottom" : "to top";
-    gradientDiv.style.background = `linear-gradient(${direction}, var(--light) 20%, transparent 100%)`;
+    div.style.maskImage = `linear-gradient(${direction}, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 100%)`;
+    div.style.webkitMaskImage = `linear-gradient(${direction}, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 100%)`;
     
-    container.appendChild(gradientDiv);
+    // FADE THE TEXT to the background color
+    div.style.background = `linear-gradient(${direction}, var(--light) 20%, transparent 100%)`;
     
-    return container;
+    return div;
   };
 
   document.body.appendChild(createSmoothBlur(true));
