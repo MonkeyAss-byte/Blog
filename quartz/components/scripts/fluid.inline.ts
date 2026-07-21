@@ -314,20 +314,21 @@ document.addEventListener("DOMContentLoaded", () => {
     dx: 0,
     dy: 0,
     down: false,
-    color: [0, 0.95, 1], // Quantum Neon Cyan
+    color: [0.0, 1.0, 0.4], // Quantum Phosphor Green
   }
   pointers.push(activePointer)
 
-  // Generate color palette (neon pink, cyan, purple, magenta)
+  // Generate color palette (monochromatic terminal greens)
   function getRandomNeonColor(): number[] {
     const palette = [
-      [0.0, 0.95, 1.0],  // Neon Cyan
-      [1.0, 0.0, 0.48],  // Neon Pink
-      [0.6, 0.2, 1.0],  // Neon Purple
-      [0.0, 1.0, 0.6],  // Neon Emerald
+      [0.0, 1.0, 0.4],   // Phosphor Green
+      [0.0, 0.8, 0.25],  // Matrix Green
+      [0.2, 0.9, 0.5],   // Bright Terminal Green
+      [0.0, 0.6, 0.15],  // Darker Matrix Green
     ]
     return palette[Math.floor(Math.random() * palette.length)]
   }
+
 
   // Event Listeners on WINDOW (global detection, avoids element blocking)
   window.addEventListener("mousedown", (e) => {

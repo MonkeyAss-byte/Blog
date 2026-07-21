@@ -16,30 +16,31 @@ configuration:
     fontOrigin: googleFonts
     cdnCaching: true
     typography:
-      header: Schibsted Grotesk
-      body: Source Sans Pro
+      header: IBM Plex Mono
+      body: IBM Plex Mono
       code: IBM Plex Mono
     colors:
       lightMode:
-        light: "#FAF9FC"
-        lightgray: "#ECE9F2"
-        gray: "#7C7393"
-        darkgray: "#2E2640"
-        dark: "#110C1A"
-        secondary: "#9B00E8"
-        tertiary: "#00B4D8"
-        highlight: "rgba(155, 0, 232, 0.08)"
-        textHighlight: "#9b00e844"
+        light: "#F5F6F7"
+        lightgray: "#E2E4E7"
+        gray: "#5A6572"
+        darkgray: "#24292E"
+        dark: "#1B1F23"
+        secondary: "#006622"
+        tertiary: "#0099B8"
+        highlight: "rgba(0, 102, 34, 0.08)"
+        textHighlight: "#00662222"
       darkMode:
-        light: "#0F0C1B"
-        lightgray: "#1D1933"
-        gray: "#5F568C"
-        darkgray: "#DDD7FF"
-        dark: "#FFFFFF"
-        secondary: "#00E5FF"
-        tertiary: "#FF007A"
-        highlight: "rgba(255, 0, 122, 0.12)"
-        textHighlight: "#ff007a55"
+        light: "#06090E"
+        lightgray: "#151E28"
+        gray: "#4F6072"
+        darkgray: "#C5D4E2"
+        dark: "#00FF5F"
+        secondary: "#00FF5F"
+        tertiary: "#00F2FE"
+        highlight: "rgba(0, 255, 95, 0.08)"
+        textHighlight: "#00ff5f33"
+
 
 plugins:
   - source: github:quartz-community/created-modified-date
