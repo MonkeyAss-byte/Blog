@@ -150,3 +150,8 @@ h1, h2, h3, h4, h5, h6, .page-title {
 .sidebar .explorer ul li a, .sidebar .recent-notes ul li a, .sidebar .toc ul li a {
   transition: color 0.2s ease, background-color 0.2s ease;
 }
+
+// Hide duplicated H1 title from Markdown body (since Quartz renders the page title)
+article > h1:first-of-type {
+  display: none;
+}
