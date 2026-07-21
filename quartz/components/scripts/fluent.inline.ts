@@ -153,26 +153,39 @@ function setupEdgeBlur() {
   // Only apply on desktop to avoid obscuring mobile UI
   if (window.innerWidth <= 768) return;
 
-  const topDiv = document.createElement("div");
-  topDiv.className = "edge-blur-layer top";
-  topDiv.style.top = "0";
-  topDiv.style.height = "100px";
-  topDiv.style.backdropFilter = "blur(12px) brightness(0.85)";
-  topDiv.style.webkitBackdropFilter = "blur(12px) brightness(0.85)";
-  topDiv.style.maskImage = "linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 100%)";
-  topDiv.style.webkitMaskImage = "linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 100%)";
-  
-  const bottomDiv = document.createElement("div");
-  bottomDiv.className = "edge-blur-layer bottom";
-  bottomDiv.style.bottom = "0";
-  bottomDiv.style.height = "100px";
-  bottomDiv.style.backdropFilter = "blur(12px) brightness(0.85)";
-  bottomDiv.style.webkitBackdropFilter = "blur(12px) brightness(0.85)";
-  bottomDiv.style.maskImage = "linear-gradient(to top, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 100%)";
-  bottomDiv.style.webkitMaskImage = "linear-gradient(to top, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 100%)";
-  
-  document.body.appendChild(topDiv);
-  document.body.appendChild(bottomDiv);
+  const createSteppedBlur = (isTop: boolean) => {
+    const container = document.createElement("div");
+    container.className = `edge-blur-layer ${isTop ? "top" : "bottom"}`;
+    container.style.position = "fixed";
+    container.style[isTop ? "top" : "bottom"] = "0";
+    container.style.left = "0";
+    container.style.right = "0";
+    container.style.height = "100px";
+    container.style.display = "flex";
+    container.style.flexDirection = "column";
+    container.style.pointerEvents = "none";
+    container.style.zIndex = "999999";
+    
+    // We use stepped divs because mask-image is bugged on Chrome and creates solid colors.
+    // This perfectly aligns the visual style with the sidebars (grayscale + dark + blur).
+    const steps = 5;
+    for (let i = 0; i < steps; i++) {
+      const stepDiv = document.createElement("div");
+      const strength = isTop ? (steps - i) : (i + 1); // 5 to 1 (top), or 1 to 5 (bottom)
+      const blurAmount = strength * 2.5; // Up to 12.5px
+      const dimAmount = 1 - (strength * 0.08); // brightness goes down to 0.6
+      const grayAmount = strength * 20; // up to 100% grayscale
+      
+      stepDiv.style.flex = "1";
+      stepDiv.style.backdropFilter = `blur(${blurAmount}px) grayscale(${grayAmount}%) brightness(${dimAmount})`;
+      stepDiv.style.webkitBackdropFilter = `blur(${blurAmount}px) grayscale(${grayAmount}%) brightness(${dimAmount})`;
+      container.appendChild(stepDiv);
+    }
+    return container;
+  };
+
+  document.body.appendChild(createSteppedBlur(true));
+  document.body.appendChild(createSteppedBlur(false));
 }
 
 document.addEventListener("nav", () => {

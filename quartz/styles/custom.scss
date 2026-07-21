@@ -238,23 +238,38 @@ body:has(.center:hover) .edge-blur-layer {
     margin-bottom: 2rem !important;
   }
 
-  // --- Mobile Clean Vertical Stack ---
-  // We use the default Quartz grid but force all items to be clean stacked cards
+  // --- Mobile Tablet-like Mini Dashboard ---
+  // We use a miniature 2-column grid. The browser will zoom out automatically to fit the min-width.
+  .page {
+    min-width: 600px !important; // Forces mobile browser to zoom out, maintaining the perfect layout!
+    overflow-x: hidden !important;
+  }
+  
   #quartz-body {
-    padding: 0 0.5rem !important;
+    display: grid !important;
+    grid-template-columns: 200px 1fr !important;
+    grid-template-areas: "grid-sidebar-left grid-center" !important;
+    gap: 1.5rem !important;
+    padding: 0.5rem 1rem !important;
   }
   
-  .center {
-    padding: 1.5rem 1rem !important;
-    border-radius: 12px !important;
-    min-width: 0 !important; // Fix flexbox shrinking
+  .sidebar.right {
+    display: none !important; // Hide right sidebar on mobile dashboard
   }
   
-  .sidebar.left, .sidebar.right {
-    padding: 0 !important;
+  .sidebar.left {
+    grid-area: grid-sidebar-left !important;
     display: flex !important;
     flex-direction: column !important;
     gap: 1rem !important;
+    padding: 0 !important;
+  }
+  
+  .center {
+    grid-area: grid-center !important;
+    padding: 1.5rem 1rem !important;
+    border-radius: 12px !important;
+    min-width: 0 !important; // Fix flexbox shrinking
   }
   
   // Force the explorer to be flat and visible (no hamburger dropdown needed)
