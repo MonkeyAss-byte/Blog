@@ -58,16 +58,20 @@ body::after {
 
 // 3. Layer 1 — Mica Material (Main Content Area)
 .center {
-  background: color-mix(in srgb, var(--light) 72%, transparent) !important;
-  backdrop-filter: blur(40px) saturate(120%);
-  -webkit-backdrop-filter: blur(40px) saturate(120%);
-  border: 1px solid var(--lightgray);
+  background: color-mix(in srgb, var(--light) 75%, transparent) !important;
+  backdrop-filter: blur(40px) saturate(150%);
+  -webkit-backdrop-filter: blur(40px) saturate(150%);
+  border: 1px solid color-mix(in srgb, var(--darkgray) 10%, transparent);
   border-top: 1px solid rgba(255, 255, 255, 0.15); // Inner Light edge
   border-radius: 8px;
   box-sizing: border-box;
   padding: 2rem;
   margin-top: 2rem;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+
+  // Feathered top and bottom edges (short blur/fade)
+  mask-image: linear-gradient(to bottom, transparent 0px, black 24px, black calc(100% - 24px), transparent 100%);
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0px, black 24px, black calc(100% - 24px), transparent 100%);
   
   @media all and ($mobile) {
     margin-top: 1rem;
@@ -183,8 +187,8 @@ h1, h2, h3, h4, h5, h6, .page-title {
 }
 
 // Hide duplicated H1 title from Markdown body (since Quartz renders the page title)
-.center > h1:first-of-type,
-.center > .popover-hint > h1:first-of-type {
+.markdown-rendered > h1:first-of-type,
+.popover-hint > .markdown-rendered > h1:first-of-type {
   display: none !important;
 }
 
