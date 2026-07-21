@@ -165,7 +165,7 @@ function setupEdgeBlur() {
     div.style[isTop ? "top" : "bottom"] = "0";
     div.style.left = "0";
     div.style.right = "0";
-    div.style.height = "150px"; // Expanded range
+    div.style.height = "80px"; // Reduced range per user feedback
     div.style.pointerEvents = "none";
     div.style.zIndex = "999999";
     
