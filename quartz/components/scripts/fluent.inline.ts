@@ -160,18 +160,18 @@ function setupEdgeBlur() {
     div.style[isTop ? "top" : "bottom"] = "0";
     div.style.left = "0";
     div.style.right = "0";
-    div.style.height = "120px";
+    div.style.height = "80px"; // Closer to edge
     div.style.pointerEvents = "none";
     div.style.zIndex = "999999";
     
-    // We use a single backdrop-filter with a gradient mask. 
-    // This creates a perfectly smooth distance-field blur without any steps or hard lines!
-    div.style.backdropFilter = "blur(12px) grayscale(100%) brightness(0.7)";
-    div.style.webkitBackdropFilter = "blur(12px) grayscale(100%) brightness(0.7)";
+    // Pure blur without brightness/grayscale to prevent the "black gradient" look
+    div.style.backdropFilter = "blur(10px)";
+    div.style.webkitBackdropFilter = "blur(10px)";
     
+    // Softer gradient fade
     const direction = isTop ? "to bottom" : "to top";
-    div.style.maskImage = `linear-gradient(${direction}, black 0%, black 10%, transparent 100%)`;
-    div.style.webkitMaskImage = `linear-gradient(${direction}, black 0%, black 10%, transparent 100%)`;
+    div.style.maskImage = `linear-gradient(${direction}, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 100%)`;
+    div.style.webkitMaskImage = `linear-gradient(${direction}, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 100%)`;
     
     return div;
   };
