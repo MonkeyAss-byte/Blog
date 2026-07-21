@@ -1,6 +1,5 @@
 import { QuartzComponent, QuartzComponentConstructor, QuartzComponentProps } from "./types"
-// @ts-ignore
-import fluentScript from "./scripts/fluent.inline"
+
 
 const Body: QuartzComponent = ({ children }: QuartzComponentProps) => {
   return (
@@ -10,7 +9,6 @@ const Body: QuartzComponent = ({ children }: QuartzComponentProps) => {
   )
 }
 
-Body.afterDOMLoaded = fluentScript
 
 export default (() => Body) satisfies QuartzComponentConstructor
 
