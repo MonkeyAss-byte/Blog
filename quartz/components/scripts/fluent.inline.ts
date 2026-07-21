@@ -169,9 +169,9 @@ function setupEdgeBlur() {
     div.style.pointerEvents = "none";
     div.style.zIndex = "999999";
     
-    // Stronger blur intensity
-    div.style.backdropFilter = "blur(16px)";
-    div.style.webkitBackdropFilter = "blur(16px)";
+    // Moderate blur intensity per user feedback
+    div.style.backdropFilter = "blur(8px)";
+    div.style.webkitBackdropFilter = "blur(8px)";
     
     // FADE THE BLUR ITSELF using a mask
     const direction = isTop ? "to bottom" : "to top";
