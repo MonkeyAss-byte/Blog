@@ -209,10 +209,7 @@ h1, h2, h3, h4, h5, h6, .page-title {
 // --- 4. Viewport Edge Blur (Stepped DIVs fallback) ---
 // These classes are injected via JS because mask-image backdrop-filter is bugged on some Chromium builds
 .edge-blur-layer {
-  position: fixed;
-  left: 0; right: 0;
-  z-index: 999999;
-  pointer-events: none;
+  // Styles handled by JS directly now
   opacity: 0;
   transition: opacity 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
@@ -241,42 +238,23 @@ body:has(.center:hover) .edge-blur-layer {
     margin-bottom: 2rem !important;
   }
 
-  // --- Mobile Dashboard Mode (3-column layout) ---
-  // The user explicitly requested the Desktop layout on mobile, relying on "tap to focus" to read.
+  // --- Mobile Clean Vertical Stack ---
+  // We use the default Quartz grid but force all items to be clean stacked cards
   #quartz-body {
-    display: flex !important;
-    flex-direction: row !important;
-    align-items: flex-start !important;
-    gap: 0.5rem !important;
     padding: 0 0.5rem !important;
   }
   
-  .sidebar.left {
-    flex: 1 !important;
-    order: 1 !important;
-    display: flex !important;
-    flex-direction: column !important;
-    position: static !important;
-    height: auto !important;
-    padding: 0 !important;
-  }
-  
   .center {
-    flex: 2 !important;
-    order: 2 !important;
-    padding: 1rem 0.8rem !important;
-    margin-top: 0 !important;
-    border-radius: 8px !important;
+    padding: 1.5rem 1rem !important;
+    border-radius: 12px !important;
+    min-width: 0 !important; // Fix flexbox shrinking
   }
   
-  .sidebar.right {
-    flex: 1 !important;
-    order: 3 !important;
+  .sidebar.left, .sidebar.right {
+    padding: 0 !important;
     display: flex !important;
     flex-direction: column !important;
-    position: static !important;
-    height: auto !important;
-    padding: 0 !important;
+    gap: 1rem !important;
   }
   
   // Force the explorer to be flat and visible (no hamburger dropdown needed)
@@ -290,24 +268,23 @@ body:has(.center:hover) .edge-blur-layer {
     visibility: visible !important;
     max-height: none !important;
     margin-top: 0 !important;
+    padding: 0 !important;
   }
   
-  // Apply card styling to sidebars, scaled down for dashboard view
+  // Apply card styling to sidebars for vertical tiling
   .sidebar.left > .explorer, .sidebar.right > *, .popover {
-    padding: 0.8rem !important;
-    border-radius: 8px !important;
-    margin-bottom: 0.8rem !important; 
+    padding: 1.2rem !important;
+    border-radius: 12px !important;
     width: 100% !important;
     box-sizing: border-box !important;
   }
 
-  // Scale down typography for the dashboard view
+  // Typography for vertical stack
   .markdown-rendered {
-    font-size: 0.6rem !important;
-    p, li { line-height: 1.5 !important; margin-bottom: 0.5rem !important; }
-    h1 { font-size: 1.2rem !important; margin-bottom: 0.5rem !important; }
-    h2 { font-size: 1rem !important; margin-top: 1rem !important; margin-bottom: 0.5rem !important; }
-    h3 { font-size: 0.8rem !important; margin-top: 1rem !important; margin-bottom: 0.5rem !important; }
+    p, li { line-height: 1.6 !important; margin-bottom: 0.8rem !important; }
+    h1 { font-size: 1.8rem !important; margin-bottom: 1rem !important; }
+    h2 { font-size: 1.4rem !important; margin-top: 1.5rem !important; margin-bottom: 0.8rem !important; }
+    h3 { font-size: 1.2rem !important; margin-top: 1.2rem !important; margin-bottom: 0.6rem !important; }
   }
 
   // --- Mobile Focus Modal ---
