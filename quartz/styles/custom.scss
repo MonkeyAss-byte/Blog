@@ -213,6 +213,13 @@ h1, h2, h3, h4, h5, h6, .page-title {
   left: 0; right: 0;
   z-index: 999999;
   pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+// Show the edge blur ONLY when the center block is hovered (Focus Mode)
+body:has(.center:hover) .edge-blur-layer {
+  opacity: 1;
 }
 
 // --- 5. Mobile Layout Optimization ---
@@ -239,12 +246,14 @@ h1, h2, h3, h4, h5, h6, .page-title {
   }
   
   // 3. Spread out the sidebar component cards
-  .sidebar.left, .sidebar.right {
+  // ONLY for the right sidebar so we don't break the top header (which is in sidebar.left)
+  .sidebar.right {
     flex-direction: column !important; // FIX: Prevent horizontal squeezing
     padding: 0 !important;
   }
   
-  .sidebar .explorer, .sidebar .recent-notes, .sidebar .toc, .sidebar .backlinks, .popover {
+  // Exclude .explorer from these heavy card styles on mobile so the hamburger menu stays neat
+  .sidebar.right > *, .center, .popover {
     padding: 1.5rem !important;
     border-radius: 16px !important;
     margin-bottom: 1.5rem !important; // More space between each sidebar card
