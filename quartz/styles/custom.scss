@@ -229,7 +229,10 @@ body:has(.center:hover) .edge-blur-layer {
   .page-header {
     margin-bottom: 2rem !important;
   }
-
+  // Hide the explorer menu entirely on mobile as requested
+  .explorer {
+    display: none !important;
+  }
 
   // Restore typography to normal readable sizes for a vertical layout
   .markdown-rendered {

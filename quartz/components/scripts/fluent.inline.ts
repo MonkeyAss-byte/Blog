@@ -169,9 +169,9 @@ function setupEdgeBlur() {
     div.style.pointerEvents = "none";
     div.style.zIndex = "999999";
     
-    // Soft blur intensity
-    div.style.backdropFilter = "blur(6px)";
-    div.style.webkitBackdropFilter = "blur(6px)";
+    // Stronger blur intensity (multiplied by the mask for a soft fade)
+    div.style.backdropFilter = "blur(16px)";
+    div.style.webkitBackdropFilter = "blur(16px)";
     
     // FADE THE BLUR ITSELF using a mask (fixes the "hard line" issue)
     const direction = isTop ? "to bottom" : "to top";
