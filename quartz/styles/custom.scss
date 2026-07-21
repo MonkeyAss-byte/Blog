@@ -203,3 +203,9 @@ h1, h2, h3, h4, h5, h6, .page-title {
   filter: blur(5px);
   opacity: 0.35;
 }
+
+// Reduce the distracting brightness changes of the active TOC item while reading
+.page:has(.center:hover) .sidebar .toc-content a.in-view {
+  opacity: 0.45 !important;
+  color: var(--gray) !important;
+}
