@@ -70,9 +70,9 @@ body::after {
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
   
   @media all and ($mobile) {
-    margin-top: 1rem;
-    padding: 1.2rem;
-    border-radius: 4px;
+    margin-top: 0.5rem;
+    padding: 1.5rem 1.2rem;
+    border-radius: 12px;
   }
 }
 
@@ -225,4 +225,20 @@ h1, h2, h3, h4, h5, h6, .page-title {
   -webkit-backdrop-filter: blur(8px);
   mask-image: linear-gradient(to top, black 10%, transparent 100%);
   -webkit-mask-image: linear-gradient(to top, black 10%, transparent 100%);
+}
+
+// --- 5. Mobile Layout Optimization ---
+@media all and ($mobile) {
+  #quartz-body {
+    padding: 0 0.5rem !important; // Reduce outer gap
+  }
+  
+  .sidebar .explorer, .sidebar .recent-notes, .sidebar .toc, .sidebar .backlinks, .popover {
+    padding: 1rem !important;
+    border-radius: 12px !important;
+  }
+
+  // Adjust typography for mobile
+  h1 { font-size: 1.75rem !important; }
+  h2 { font-size: 1.4rem !important; }
 }
