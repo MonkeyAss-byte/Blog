@@ -21,8 +21,6 @@ MonkeyAss-byte，图形渲染与游戏开发方向。
 
 记录个人项目的开发过程、技术难点与解决方案。
 
-> *从想法到落地，每一步都有迹可循。*
-
 </div>
 
 <div style="flex: 1; min-width: 240px; padding: 1.2rem; border-radius: 4px; background: var(--highlight);">
@@ -31,8 +29,6 @@ MonkeyAss-byte，图形渲染与游戏开发方向。
 
 深入拆解图形渲染、Shader 编程、引擎底层等硬核知识。
 
-> *知其然，更知其所以然。*
-
 </div>
 
 </div>
@@ -40,12 +36,6 @@ MonkeyAss-byte，图形渲染与游戏开发方向。
 ---
 
 ## 最近更新
-
-| 文章 | 日期 | 标签 |
-|------|------|------|
-| *暂无内容* | — | — |
-
----
 
 ## 技术栈
 
@@ -59,14 +49,3 @@ MonkeyAss-byte，图形渲染与游戏开发方向。
 <span style="padding: 0.3rem 0.8rem; border-radius: 4px; background: var(--secondary); color: white; font-size: 0.85rem;">实时渲染</span>
 
 </div>
-
----
-
-## 关于本站
-
-本站基于 [Quartz v5](https://quartz.jzhao.xyz) 构建，所有内容以 Markdown 编写，支持：
-
-- 双向链接 —— 让知识形成网络
-- 知识图谱 —— 可视化笔记间的关联
-- 全文搜索 —— 快速定位所需内容
-- 深色模式 —— 保护你的双眼

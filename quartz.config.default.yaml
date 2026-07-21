@@ -200,10 +200,17 @@ plugins:
     enabled: true
     options:
       links:
-        GitHub: https://github.com/jackyzha0/quartz
-        Discord Community: https://discord.gg/cRFFHYye7t
+        GitHub: https://github.com/MonkeyAss-byte
   - source: github:quartz-community/recent-notes
-    enabled: false
+    enabled: true
+    options:
+      limit: 5
+      showTags: true
+      hideFolderPages: true
+      hideTagPages: true
+    layout:
+      position: left
+      priority: 60
   - source: github:quartz-community/spacer
     enabled: true
     options: {}
