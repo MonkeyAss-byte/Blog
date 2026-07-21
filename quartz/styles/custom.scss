@@ -136,7 +136,7 @@ h1, h2, h3, h4, h5, h6, .page-title {
 // --- 1. Reveal Highlight ---
 .center, .sidebar .explorer, .sidebar .recent-notes, .sidebar .toc, .sidebar .backlinks, .popover {
   position: relative;
-  overflow: hidden; // Keep the glow inside the card bounds
+  // Removed overflow: hidden so mobile explorer dropdowns aren't clipped
 }
 
 .center::after, .sidebar .explorer::after, .sidebar .recent-notes::after, .sidebar .toc::after, .sidebar .backlinks::after, .popover::after {
@@ -156,6 +156,7 @@ h1, h2, h3, h4, h5, h6, .page-title {
   pointer-events: none;
   opacity: 0;
   transition: opacity 0.5s ease;
+  border-radius: inherit; // Try to keep the glow inside the card without overflow: hidden
 }
 
 .center:hover::after, .sidebar .explorer:hover::after, .sidebar .recent-notes:hover::after, .sidebar .toc:hover::after, .sidebar .backlinks:hover::after, .popover:hover::after {
@@ -216,6 +217,7 @@ h1, h2, h3, h4, h5, h6, .page-title {
   pointer-events: none;
   // Chrome bug workaround: backdrop-filter needs a tiny background color to mask properly
   background: rgba(255, 255, 255, 0.01);
+  transform: translateZ(0); // Force hardware compositing to fix mask-image backdrop-filter bug
 }
 
 #quartz-root::before {
@@ -264,5 +266,28 @@ h1, h2, h3, h4, h5, h6, .page-title {
     h1 { font-size: 2rem !important; margin-bottom: 1.5rem !important; }
     h2 { font-size: 1.6rem !important; margin-top: 2.5rem !important; margin-bottom: 1.2rem !important; }
     h3 { font-size: 1.4rem !important; margin-top: 2rem !important; margin-bottom: 1rem !important; }
+  }
+
+  // 5. Mobile Tap-to-Focus States
+  // When ANY block is focused on mobile, blur the un-focused ones
+  .page.has-mobile-focus .center:not(.mobile-focused),
+  .page.has-mobile-focus .sidebar > *:not(.mobile-focused),
+  .page.has-mobile-focus footer {
+    opacity: 0.3 !important;
+    filter: blur(4px) grayscale(50%) !important;
+    transition: opacity 0.4s ease, filter 0.4s ease !important;
+  }
+
+  // The focused block itself
+  .mobile-focused {
+    transform: scale(1.02) !important;
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.2) !important;
+    z-index: 50 !important;
+    transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.4s ease !important;
+  }
+  
+  // Base transition for all cards
+  .center, .sidebar > * {
+    transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.4s ease, opacity 0.4s ease, filter 0.4s ease !important;
   }
 }

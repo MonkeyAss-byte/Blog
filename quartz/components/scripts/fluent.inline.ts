@@ -64,7 +64,80 @@ function setupFluentMotion() {
   }
 }
 
-document.addEventListener("nav", setupFluentMotion);
-window.addEventListener("DOMContentLoaded", setupFluentMotion);
+// --- 4. Mobile Tap-to-Focus Interaction ---
+function setupMobileInteraction() {
+  const cards = document.querySelectorAll(
+    ".center, .sidebar .explorer, .sidebar .recent-notes, .sidebar .toc, .sidebar .backlinks, .popover"
+  ) as NodeListOf<HTMLElement>;
+  
+  const page = document.querySelector(".page") as HTMLElement;
+  if (!page) return;
+
+  // Variables to track swipe
+  let touchStartY = 0;
+  let isScrolling = false;
+
+  // Global listener to dismiss focus when tapping outside
+  document.addEventListener("touchstart", (e) => {
+    // If we click outside any card, remove focus from all
+    const target = e.target as Node;
+    let clickedInsideCard = false;
+    cards.forEach(card => {
+      if (card.contains(target)) clickedInsideCard = true;
+    });
+
+    if (!clickedInsideCard) {
+      cards.forEach(c => c.classList.remove("mobile-focused"));
+      page.classList.remove("has-mobile-focus");
+    }
+  }, { passive: true });
+
+  for (const card of cards) {
+    if (card.dataset.mobileFocusInit) continue;
+    card.dataset.mobileFocusInit = "true";
+
+    card.addEventListener("touchstart", (e: TouchEvent) => {
+      touchStartY = e.touches[0].clientY;
+      isScrolling = false;
+    }, { passive: true });
+
+    card.addEventListener("touchmove", (e: TouchEvent) => {
+      const touchY = e.touches[0].clientY;
+      if (Math.abs(touchY - touchStartY) > 10) {
+        isScrolling = true; // User is swiping/scrolling
+      }
+    }, { passive: true });
+
+    card.addEventListener("touchend", (e: TouchEvent) => {
+      if (isScrolling) return; // Filter out swipes
+
+      // It's a clean tap!
+      const isAlreadyFocused = card.classList.contains("mobile-focused");
+      
+      // Remove focus from all cards first
+      cards.forEach(c => c.classList.remove("mobile-focused"));
+
+      if (isAlreadyFocused) {
+        // Toggle off
+        page.classList.remove("has-mobile-focus");
+      } else {
+        // Toggle on
+        card.classList.add("mobile-focused");
+        page.classList.add("has-mobile-focus");
+      }
+    });
+  }
+}
+
+document.addEventListener("nav", () => {
+  setupFluentMotion();
+  setupMobileInteraction();
+});
+window.addEventListener("DOMContentLoaded", () => {
+  setupFluentMotion();
+  setupMobileInteraction();
+});
 // Run once immediately in case DOM is already loaded
 setupFluentMotion();
+setupMobileInteraction();
+
