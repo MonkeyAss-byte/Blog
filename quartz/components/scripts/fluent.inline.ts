@@ -170,8 +170,8 @@ function setupEdgeBlur() {
     div.style.zIndex = "999999";
     
     // Moderate blur intensity per user feedback
-    div.style.backdropFilter = "blur(8px)";
-    div.style.webkitBackdropFilter = "blur(8px)";
+    div.style.backdropFilter = "blur(12px)";
+    div.style.webkitBackdropFilter = "blur(12px)";
     
     // FADE THE BLUR ITSELF using a mask
     const direction = isTop ? "to bottom" : "to top";
@@ -179,8 +179,8 @@ function setupEdgeBlur() {
     div.style.webkitMaskImage = `linear-gradient(${direction}, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 100%)`;
     
     // FADE THE TEXT contrast gently by overlaying a semi-transparent background color
-    // We use color-mix to make var(--light) 60% opaque at the very edge, fading to 0%.
-    div.style.background = `linear-gradient(${direction}, color-mix(in srgb, var(--light) 60%, transparent) 0%, transparent 100%)`;
+    // We use color-mix to make var(--light) 90% opaque at the very edge, fading to 0%.
+    div.style.background = `linear-gradient(${direction}, color-mix(in srgb, var(--light) 90%, transparent) 0%, transparent 100%)`;
     
     return div;
   };
