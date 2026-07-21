@@ -258,6 +258,10 @@ html::after {
 
 // --- 5. Mobile Layout Optimization ---
 @media all and ($mobile) {
+  html, body {
+    overflow-x: hidden; // Prevent horizontal scrollbars when cards scale up
+  }
+
   // 1. Give the main layout more breathing room vertically
   #quartz-body {
     row-gap: 2.5rem !important; // Spread out the major sections (header, center, sidebars)
