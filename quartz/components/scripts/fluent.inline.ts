@@ -103,7 +103,7 @@ function setupMobileInteraction() {
 
     card.addEventListener("touchmove", (e: TouchEvent) => {
       const touchY = e.touches[0].clientY;
-      if (Math.abs(touchY - touchStartY) > 10) {
+      if (Math.abs(touchY - touchStartY) > 20) { // Increased threshold to avoid fat-finger misfires
         isScrolling = true; // User is swiping/scrolling
       }
     }, { passive: true });
@@ -124,20 +124,77 @@ function setupMobileInteraction() {
         // Toggle on
         card.classList.add("mobile-focused");
         page.classList.add("has-mobile-focus");
+        // Optional: scroll slightly to center it
+        // card.scrollIntoView({ behavior: "smooth", block: "center" });
       }
     });
   }
 }
 
+// --- 5. Dark Mode View Transition Hack ---
+function setupDarkmodeTransition() {
+  const btn = document.querySelector(".darkmode") as HTMLElement;
+  if (!btn || btn.dataset.transitionInit) return;
+  btn.dataset.transitionInit = "true";
+
+  // Clone button to strip default Quartz listeners
+  const clone = btn.cloneNode(true) as HTMLElement;
+  btn.replaceWith(clone);
+
+  clone.addEventListener("click", (e) => {
+    const isDark = document.documentElement.getAttribute("saved-theme") === "dark";
+    const newTheme = isDark ? "light" : "dark";
+
+    const applyTheme = () => {
+      document.documentElement.setAttribute("saved-theme", newTheme);
+      localStorage.setItem("theme", newTheme);
+      document.body.classList.remove("theme-dark", "theme-light");
+      document.body.classList.add(`theme-${newTheme}`);
+      document.dispatchEvent(new CustomEvent("themechange", { detail: { theme: newTheme } }));
+    };
+
+    if (!document.startViewTransition) {
+      applyTheme();
+      return;
+    }
+
+    const x = e.clientX;
+    const y = e.clientY;
+    const endRadius = Math.hypot(Math.max(x, window.innerWidth - x), Math.max(y, window.innerHeight - y));
+
+    const transition = document.startViewTransition(() => applyTheme());
+
+    transition.ready.then(() => {
+      const clipPath = [
+        `circle(0px at ${x}px ${y}px)`,
+        `circle(${endRadius}px at ${x}px ${y}px)`
+      ];
+      document.documentElement.animate(
+        {
+          clipPath: newTheme === "dark" ? clipPath : clipPath.slice().reverse(),
+        },
+        {
+          duration: 600,
+          easing: "ease-in-out",
+          pseudoElement: newTheme === "dark" ? "::view-transition-new(root)" : "::view-transition-old(root)",
+        }
+      );
+    });
+  });
+}
+
 document.addEventListener("nav", () => {
   setupFluentMotion();
   setupMobileInteraction();
+  setupDarkmodeTransition();
 });
 window.addEventListener("DOMContentLoaded", () => {
   setupFluentMotion();
   setupMobileInteraction();
+  setupDarkmodeTransition();
 });
 // Run once immediately in case DOM is already loaded
 setupFluentMotion();
 setupMobileInteraction();
+setupDarkmodeTransition();
 
