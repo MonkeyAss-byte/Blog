@@ -1,3 +1,50 @@
 @use "./variables.scss" as *;
 
-// put your custom CSS here!
+// WebGL Fluid Simulation Background Integration
+
+#fluid-canvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: -2; // Put it behind everything including the main body
+  pointer-events: none;
+  background: transparent !important;
+}
+
+// Make body and root containers transparent so fluid canvas is visible
+body, #quartz-root, .page, .center {
+  background: transparent !important;
+}
+
+// Add a premium semi-transparent overlay to content so text remains readable
+.page {
+  background: transparent !important;
+}
+
+// Glow effect on links hover
+a.internal, a.external {
+  transition: text-shadow 0.3s ease, color 0.3s ease;
+  
+  &:hover {
+    text-shadow: 0 0 8px var(--secondary);
+  }
+}
+
+// Add smooth glassmorphism to sidebar, explorer, graph panels
+.explorer-container, .graph-outer, .backlinks, #quartz-sidebar {
+  background: color-mix(in srgb, var(--light) 75%, transparent) !important;
+  backdrop-filter: blur(12px) saturate(120%);
+  -webkit-backdrop-filter: blur(12px) saturate(120%);
+  border: 1px solid color-mix(in srgb, var(--lightgray) 40%, transparent) !important;
+  border-radius: 12px;
+  padding: 1.2rem;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  
+  &:hover {
+    border-color: color-mix(in srgb, var(--secondary) 50%, transparent) !important;
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.15);
+  }
+}
+
