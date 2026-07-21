@@ -1,5 +1,11 @@
 @use "./variables.scss" as *;
 
+@import url('https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;700&display=swap');
+
+:root {
+  --headerFont: "Lora", "Noto Serif SC", "Source Han Serif SC", serif !important;
+}
+
 // Phase 1: Fluent Design Foundations - Background & Material System
 
 // 1. Geometric Dot Grid Background (Replaces WebGL Fluid)
