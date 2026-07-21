@@ -99,3 +99,54 @@ h1, h2, h3, h4, h5, h6, .page-title {
 * {
   transition: background-color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
 }
+
+// Phase 2: Fluent Motion Effects
+
+// --- 1. Reveal Highlight ---
+.center, .sidebar .explorer, .sidebar .recent-notes, .sidebar .toc, .sidebar .backlinks, .popover {
+  position: relative;
+  overflow: hidden; // Keep the glow inside the card bounds
+}
+
+.center::after, .sidebar .explorer::after, .sidebar .recent-notes::after, .sidebar .toc::after, .sidebar .backlinks::after, .popover::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  // A subtle glow effect that follows --mouse-x and --mouse-y from JS
+  background: radial-gradient(
+    600px circle at var(--mouse-x, -9999px) var(--mouse-y, -9999px),
+    rgba(255, 255, 255, 0.08),
+    transparent 40%
+  );
+  z-index: -1;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.5s ease;
+}
+
+.center:hover::after, .sidebar .explorer:hover::after, .sidebar .recent-notes:hover::after, .sidebar .toc:hover::after, .sidebar .backlinks:hover::after, .popover:hover::after {
+  opacity: 1;
+  transition: opacity 0.1s ease;
+}
+
+// --- 2. Stagger Animations ---
+.stagger-item {
+  opacity: 0;
+  transform: translateY(12px) scale(0.98);
+  animation: staggerIn 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+}
+
+@keyframes staggerIn {
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+// Ensure smooth hover on items inside the cards
+.sidebar .explorer ul li a, .sidebar .recent-notes ul li a, .sidebar .toc ul li a {
+  transition: color 0.2s ease, background-color 0.2s ease;
+}

@@ -1,17 +1,16 @@
 import { QuartzComponent, QuartzComponentConstructor, QuartzComponentProps } from "./types"
 // @ts-ignore
-import fluidScript from "./scripts/fluid.inline"
+import fluentScript from "./scripts/fluent.inline"
 
 const Body: QuartzComponent = ({ children }: QuartzComponentProps) => {
   return (
     <div id="quartz-body">
-      <canvas id="fluid-canvas" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -1; pointer-events: none;"></canvas>
       {children}
     </div>
   )
 }
 
-Body.afterDOMLoaded = fluidScript
+Body.afterDOMLoaded = fluentScript
 
 export default (() => Body) satisfies QuartzComponentConstructor
 
