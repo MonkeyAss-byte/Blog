@@ -68,10 +68,6 @@ body::after {
   padding: 2rem;
   margin-top: 2rem;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
-
-  // Feathered top and bottom edges (short blur/fade)
-  mask-image: linear-gradient(to bottom, transparent 0px, black 24px, black calc(100% - 24px), transparent 100%);
-  -webkit-mask-image: linear-gradient(to bottom, transparent 0px, black 24px, black calc(100% - 24px), transparent 100%);
   
   @media all and ($mobile) {
     margin-top: 1rem;
@@ -200,12 +196,33 @@ h1, h2, h3, h4, h5, h6, .page-title {
 
 .page:has(.center:hover) .sidebar,
 .page:has(.center:hover) footer {
-  filter: blur(5px);
-  opacity: 0.35;
+  filter: blur(6px) grayscale(100%); // grayscale completely hides the TOC active item color variations
+  opacity: 0.2; // Drop opacity further to reduce distraction
 }
 
-// Reduce the distracting brightness changes of the active TOC item while reading
-.page:has(.center:hover) .sidebar .toc-content a.in-view {
-  opacity: 0.45 !important;
-  color: var(--gray) !important;
+// --- 4. Viewport Edge Blur (Sticky gradient blur) ---
+// Blur whatever scrolls under the very top and very bottom of the screen
+.page::before, .page::after {
+  content: "";
+  position: fixed;
+  left: 0; right: 0;
+  height: 60px;
+  z-index: 100;
+  pointer-events: none;
+}
+
+.page::before {
+  top: 0;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  mask-image: linear-gradient(to bottom, black 10%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to bottom, black 10%, transparent 100%);
+}
+
+.page::after {
+  bottom: 0;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  mask-image: linear-gradient(to top, black 10%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to top, black 10%, transparent 100%);
 }
