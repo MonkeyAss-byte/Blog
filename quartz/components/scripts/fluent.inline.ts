@@ -178,8 +178,9 @@ function setupEdgeBlur() {
     div.style.maskImage = `linear-gradient(${direction}, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 100%)`;
     div.style.webkitMaskImage = `linear-gradient(${direction}, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 100%)`;
     
-    // Remove the solid color gradient, rely PURELY on the masked blur
-    // div.style.background = `linear-gradient(${direction}, var(--light) 20%, transparent 100%)`;
+    // FADE THE TEXT contrast gently by overlaying a semi-transparent background color
+    // We use color-mix to make var(--light) 60% opaque at the very edge, fading to 0%.
+    div.style.background = `linear-gradient(${direction}, color-mix(in srgb, var(--light) 60%, transparent) 0%, transparent 100%)`;
     
     return div;
   };
