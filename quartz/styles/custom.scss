@@ -214,14 +214,6 @@ h1, h2, h3, h4, h5, h6, .page-title {
   transition: opacity 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
-.edge-blur-layer.top {
-  background: linear-gradient(to bottom, color-mix(in srgb, var(--light) 80%, transparent) 0%, transparent 100%);
-}
-
-.edge-blur-layer.bottom {
-  background: linear-gradient(to top, color-mix(in srgb, var(--light) 80%, transparent) 0%, transparent 100%);
-}
-
 // Show the edge blur ONLY when the center block is hovered (Focus Mode)
 body:has(.center:hover) .edge-blur-layer {
   opacity: 1;
@@ -238,19 +230,22 @@ body:has(.center:hover) .edge-blur-layer {
     margin-bottom: 2rem !important;
   }
 
-  // --- Mobile Tablet-like Mini Dashboard ---
-  // We use a miniature 2-column grid. The browser will zoom out automatically to fit the min-width.
+  // --- Mobile Tablet-like Mini Dashboard (Pure Responsive) ---
+  // We use vw units to perfectly scale a 2-column layout into the physical phone screen without overflow!
   .page {
-    min-width: 600px !important; // Forces mobile browser to zoom out, maintaining the perfect layout!
+    width: 100vw !important;
+    min-width: 0 !important;
     overflow-x: hidden !important;
   }
   
   #quartz-body {
     display: grid !important;
-    grid-template-columns: 200px 1fr !important;
+    grid-template-columns: 28vw 68vw !important; // Exactly 2 columns fitting in 100vw
     grid-template-areas: "grid-sidebar-left grid-center" !important;
-    gap: 1.5rem !important;
-    padding: 0.5rem 1rem !important;
+    gap: 2vw !important;
+    padding: 1vw !important;
+    width: 100vw !important;
+    box-sizing: border-box !important;
   }
   
   .sidebar.right {
@@ -261,15 +256,19 @@ body:has(.center:hover) .edge-blur-layer {
     grid-area: grid-sidebar-left !important;
     display: flex !important;
     flex-direction: column !important;
-    gap: 1rem !important;
+    gap: 2vw !important;
     padding: 0 !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
   }
   
   .center {
     grid-area: grid-center !important;
-    padding: 1.5rem 1rem !important;
-    border-radius: 12px !important;
-    min-width: 0 !important; // Fix flexbox shrinking
+    padding: 3vw !important;
+    border-radius: 6px !important;
+    min-width: 0 !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
   }
   
   // Force the explorer to be flat and visible (no hamburger dropdown needed)
@@ -288,19 +287,24 @@ body:has(.center:hover) .edge-blur-layer {
   
   // Apply card styling to sidebars for vertical tiling
   .sidebar.left > .explorer, .sidebar.right > *, .popover {
-    padding: 1.2rem !important;
-    border-radius: 12px !important;
+    padding: 3vw !important;
+    border-radius: 6px !important;
     width: 100% !important;
     box-sizing: border-box !important;
   }
 
-  // Typography for vertical stack
+  // Purely Responsive Typography scaled to fit the 30vw/70vw columns perfectly
   .markdown-rendered {
-    p, li { line-height: 1.6 !important; margin-bottom: 0.8rem !important; }
-    h1 { font-size: 1.8rem !important; margin-bottom: 1rem !important; }
-    h2 { font-size: 1.4rem !important; margin-top: 1.5rem !important; margin-bottom: 0.8rem !important; }
-    h3 { font-size: 1.2rem !important; margin-top: 1.2rem !important; margin-bottom: 0.6rem !important; }
+    p, li { line-height: 1.5 !important; margin-bottom: 2vw !important; font-size: 2.8vw !important; } // 2.8vw = ~11px on 390px screen
+    h1 { font-size: 5vw !important; margin-bottom: 2vw !important; }
+    h2 { font-size: 4vw !important; margin-top: 3vw !important; margin-bottom: 1.5vw !important; }
+    h3 { font-size: 3.5vw !important; margin-top: 2vw !important; margin-bottom: 1vw !important; }
+    pre { padding: 2vw !important; font-size: 2vw !important; }
   }
+  
+  .page-title a { font-size: 4vw !important; }
+  .explorer-title { font-size: 3vw !important; }
+  .explorer ul li a { font-size: 2.5vw !important; }
 
   // --- Mobile Focus Modal ---
   // When ANY block is focused on mobile, make it a massive screen-filling modal!
