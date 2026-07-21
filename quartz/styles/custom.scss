@@ -1,26 +1,57 @@
 @use "./variables.scss" as *;
 
+:root {
+  --glow-color: rgba(0, 0, 0, 0.05);
+}
 
+:root[saved-theme="dark"] {
+  --glow-color: rgba(255, 255, 255, 0.08);
+}
 
 // Phase 1: Fluent Design Foundations - Background & Material System
 
-// 1. Geometric Dot Grid Background (Replaces WebGL Fluid)
-body::before {
+// 1. Dynamic Ambient Background
+body {
+  background-color: var(--light);
+  background-image: radial-gradient(var(--lightgray) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
+// Ambient Blobs to create light/dark variation and make blur visible
+body::before, body::after {
   content: "";
   position: fixed;
-  inset: 0;
+  width: 70vw;
+  height: 70vw;
+  border-radius: 50%;
   z-index: -2;
-  background-image: radial-gradient(circle, var(--textHighlight) 1px, transparent 1px);
-  background-size: 24px 24px;
+  filter: blur(120px);
+  opacity: 0.3;
+  animation: blob-float 25s infinite alternate cubic-bezier(0.4, 0, 0.2, 1);
   pointer-events: none;
 }
 
-// 2. Radial Gradient lighting from top-left
-body {
-  background: radial-gradient(ellipse at 15% 20%, var(--highlight) 0%, transparent 60%), var(--light) !important;
+body::before {
+  background: var(--tertiary);
+  top: -20%;
+  left: -10%;
 }
 
-// Make sure layout containers don't block the background
+body::after {
+  background: var(--secondary);
+  bottom: -20%;
+  right: -10%;
+  animation-delay: -12s;
+  animation-direction: alternate-reverse;
+}
+
+@keyframes blob-float {
+  0% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(15%, 25%) scale(1.1); }
+  100% { transform: translate(-10%, 15%) scale(0.9); }
+}
+
+// 2. Make sure layout containers don't block the background
 #quartz-root, .page {
   background: transparent !important;
 }
@@ -118,7 +149,7 @@ h1, h2, h3, h4, h5, h6, .page-title {
   // A subtle glow effect that follows --mouse-x and --mouse-y from JS
   background: radial-gradient(
     600px circle at var(--mouse-x, -9999px) var(--mouse-y, -9999px),
-    rgba(255, 255, 255, 0.08),
+    var(--glow-color),
     transparent 40%
   );
   z-index: -1;
