@@ -11,3 +11,6 @@ private/
 replit.nix
 quartz/cli/tui/dist/
 .quartz/
+
+/content/Templaters/
+/content/Templaters/
