@@ -341,8 +341,8 @@ body.image-zoomed {
 
 // --- Dynamic Custom Cursor ---
 @media (pointer: fine) {
-  body.custom-cursor-active, 
-  body.custom-cursor-active * {
+  html.custom-cursor-active, 
+  html.custom-cursor-active * {
     cursor: none !important;
   }
 

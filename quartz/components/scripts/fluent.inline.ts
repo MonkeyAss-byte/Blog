@@ -285,13 +285,13 @@ function setupCustomCursor() {
     cursor.id = "fluent-cursor";
     document.body.appendChild(cursor);
   }
-  document.body.classList.add("custom-cursor-active");
+  document.documentElement.classList.add("custom-cursor-active");
 
   let mouseX = (window as any).lastMouseX || window.innerWidth / 2;
   let mouseY = (window as any).lastMouseY || window.innerHeight / 2;
   
   // Set initial position immediately to prevent top-left flash
-  cursor.style.transform = `translate3d(${mouseX}px, ${mouseY}px, 0) rotateZ(15deg) perspective(600px) rotateX(0deg) rotateY(0deg) scale(1)`;
+  cursor.style.transform = `perspective(600px) translate3d(${mouseX}px, ${mouseY}px, 0) rotateZ(15deg) rotateX(0deg) rotateY(0deg) scale(1)`;
 
   // Clean up old listeners to support SPA navigation and Hot-Reloading
   if ((window as any).fluentCursorCleanup) {
@@ -388,14 +388,14 @@ function setupCustomCursor() {
 
     const activeCursor = document.getElementById("fluent-cursor");
     if (activeCursor) {
-      activeCursor.style.transform = `translate3d(${cursorX}px, ${cursorY}px, 0) rotateZ(15deg) perspective(600px) rotateX(${currentTiltX}deg) rotateY(${currentTiltY}deg) scale(${currentScale})`;
+      activeCursor.style.transform = `perspective(600px) translate3d(${cursorX}px, ${cursorY}px, 0) rotateZ(15deg) rotateX(${currentTiltX}deg) rotateY(${currentTiltY}deg) scale(${currentScale})`;
     }
 
     // Stop animation loop if everything has settled
     if (Math.abs(dx) < 0.1 && Math.abs(dy) < 0.1 && Math.abs(currentTiltX) < 0.1 && Math.abs(currentTiltY) < 0.1 && Math.abs(currentScale - (isPressing ? 0.8 : 1)) < 0.01) {
       isMoving = false;
       if (activeCursor) {
-        activeCursor.style.transform = `translate3d(${mouseX}px, ${mouseY}px, 0) rotateZ(15deg) perspective(600px) rotateX(0deg) rotateY(0deg) scale(${isPressing ? 0.8 : 1})`;
+        activeCursor.style.transform = `perspective(600px) translate3d(${mouseX}px, ${mouseY}px, 0) rotateZ(15deg) rotateX(0deg) rotateY(0deg) scale(${isPressing ? 0.8 : 1})`;
       }
     } else {
       rafId = requestAnimationFrame(render);
