@@ -325,17 +325,18 @@ article img:not(.zoomed-in):hover {
 // This is much more reliable than backdrop-filter and automatically disables background hover effects
 body.image-zoomed {
   #zoom-overlay {
-    background: rgba(0, 0, 0, 0.4);
+    background: rgba(0, 0, 0, 0.2); // Less dark since we fade the page
   }
   
   .page {
-    filter: blur(12px) brightness(0.8);
+    filter: blur(12px);
+    opacity: 0.2; // Blend into the deepest background color
     pointer-events: none !important;
   }
 }
 
 .page {
-  transition: filter 0.4s ease, brightness 0.4s ease;
+  transition: filter 0.4s ease, opacity 0.4s ease, brightness 0.4s ease;
 }
 
 // --- Dynamic Custom Cursor ---
@@ -345,34 +346,21 @@ body.image-zoomed {
     cursor: none !important;
   }
 
-  #cursor-dot, #cursor-ring {
+  #fluent-cursor {
     position: fixed;
     top: 0;
     left: 0;
+    width: 24px;
+    height: 24px;
     pointer-events: none;
     z-index: 999999999;
-    border-radius: 50%;
-    mix-blend-mode: difference;
+    background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Cpath d='M1 1 l 7.5 20.5 l 3.5 -8.5 l 8.5 -3.5 Z' fill='%23000000' stroke='%23FFFFFF' stroke-width='1.5' stroke-linejoin='round'/%3E%3C/svg%3E");
+    background-size: contain;
+    background-repeat: no-repeat;
+    /* Pivot exactly at the arrow tip so clicking is accurate during tilt */
+    transform-origin: 1px 1px; 
     will-change: transform;
-  }
-
-  #cursor-dot {
-    width: 6px;
-    height: 6px;
-    background-color: white;
-  }
-
-  #cursor-ring {
-    width: 32px;
-    height: 32px;
-    border: 1px solid rgba(255, 255, 255, 0.5);
-    transition: width 0.2s cubic-bezier(0.2, 0.8, 0.2, 1), height 0.2s cubic-bezier(0.2, 0.8, 0.2, 1), background-color 0.2s ease, border-color 0.2s ease;
-  }
-
-  #cursor-ring.hovering {
-    width: 48px;
-    height: 48px;
-    background-color: rgba(255, 255, 255, 1);
-    border-color: transparent;
+    /* Optional shadow for depth */
+    filter: drop-shadow(0px 4px 4px rgba(0,0,0,0.3));
   }
 }

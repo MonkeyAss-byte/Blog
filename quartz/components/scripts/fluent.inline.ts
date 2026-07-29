@@ -307,28 +307,22 @@ function setupImageZoom() {
 // --- 8. Dynamic Custom Cursor ---
 function setupCustomCursor() {
   if (!window.matchMedia("(pointer: fine)").matches) return; // Only on desktop
-  if (document.getElementById("cursor-dot")) return;
+  if (document.getElementById("fluent-cursor")) return;
 
-  const dot = document.createElement("div");
-  dot.id = "cursor-dot";
-  const ring = document.createElement("div");
-  ring.id = "cursor-ring";
-  
-  document.body.appendChild(dot);
-  document.body.appendChild(ring);
-  
+  const cursor = document.createElement("div");
+  cursor.id = "fluent-cursor";
+  document.body.appendChild(cursor);
   document.body.classList.add("custom-cursor-active");
 
   let mouseX = window.innerWidth / 2;
   let mouseY = window.innerHeight / 2;
-  let ringX = mouseX;
-  let ringY = mouseY;
+  let cursorX = mouseX;
+  let cursorY = mouseY;
   let isMoving = false;
-  
+
   window.addEventListener("mousemove", (e) => {
     mouseX = e.clientX;
     mouseY = e.clientY;
-    dot.style.transform = `translate(calc(${mouseX}px - 50%), calc(${mouseY}px - 50%))`;
     if (!isMoving) {
       isMoving = true;
       requestAnimationFrame(render);
@@ -336,29 +330,40 @@ function setupCustomCursor() {
   });
 
   const render = () => {
-    // Lerp for smooth trailing effect
-    ringX += (mouseX - ringX) * 0.15;
-    ringY += (mouseY - ringY) * 0.15;
-    ring.style.transform = `translate(calc(${ringX}px - 50%), calc(${ringY}px - 50%))`;
+    // High lerp factor (0.6) for very low latency, almost instant feel
+    const lerp = 0.6; 
+    const dx = mouseX - cursorX;
+    const dy = mouseY - cursorY;
     
-    // Stop rendering if ring is very close to mouse to save CPU
-    if (Math.abs(mouseX - ringX) < 0.1 && Math.abs(mouseY - ringY) < 0.1) {
+    cursorX += dx * lerp;
+    cursorY += dy * lerp;
+
+    // Velocity for tilt
+    const velX = dx;
+    const velY = dy;
+
+    // Calculate 3D tilt based on velocity. 
+    // Max tilt is capped at 40 degrees.
+    const maxTilt = 40;
+    const speed = Math.min(Math.sqrt(velX * velX + velY * velY), 60); // Speed cap
+    
+    // Scale down slightly when moving fast (depth scale / squish)
+    const scale = 1 - (speed / 60) * 0.15; 
+    
+    // Tilt into the direction of movement
+    const tiltX = (velY / 60) * -maxTilt;
+    const tiltY = (velX / 60) * maxTilt;
+
+    cursor.style.transform = `translate3d(${cursorX}px, ${cursorY}px, 0) perspective(400px) rotateX(${tiltX}deg) rotateY(${tiltY}deg) scale(${scale})`;
+
+    // Stop animation loop if perfectly still
+    if (Math.abs(dx) < 0.1 && Math.abs(dy) < 0.1) {
       isMoving = false;
+      cursor.style.transform = `translate3d(${mouseX}px, ${mouseY}px, 0) perspective(400px) rotateX(0deg) rotateY(0deg) scale(1)`;
     } else {
       requestAnimationFrame(render);
     }
   };
-
-  // Hover magnetic effects
-  window.addEventListener("mouseover", (e) => {
-    const target = e.target as HTMLElement;
-    const isInteractable = target.closest("a, button, input, textarea, .card, article img");
-    if (isInteractable) {
-      ring.classList.add("hovering");
-    } else {
-      ring.classList.remove("hovering");
-    }
-  });
 }
 
 document.addEventListener("nav", () => {
