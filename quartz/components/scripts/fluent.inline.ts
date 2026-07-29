@@ -191,7 +191,7 @@ function setupEdgeBlur() {
 
 // --- 7. Image Long-Press Zoom & Tilt ---
 function setupImageZoom() {
-  const images = document.querySelectorAll("article img") as NodeListOf<HTMLElement>;
+  const images = document.querySelectorAll("article img") as NodeListOf<HTMLImageElement>;
   
   // Create overlay if it doesn't exist
   let overlay = document.getElementById("zoom-overlay");
@@ -206,47 +206,101 @@ function setupImageZoom() {
     img.dataset.zoomInit = "true";
     
     let isPressed = false;
+    let clone: HTMLImageElement | null = null;
+
+    const release = () => {
+      if (!isPressed) return;
+      isPressed = false;
+      document.body.classList.remove("image-zoomed");
+      
+      if (clone) {
+        // Animate clone back to original position
+        const rect = img.getBoundingClientRect();
+        clone.style.width = `${rect.width}px`;
+        clone.style.height = `${rect.height}px`;
+        clone.style.left = `${rect.left}px`;
+        clone.style.top = `${rect.top}px`;
+        clone.style.transform = `none`;
+        clone.style.boxShadow = `none`;
+        
+        const currentClone = clone;
+        setTimeout(() => {
+          if (currentClone.parentNode) currentClone.parentNode.removeChild(currentClone);
+          img.style.visibility = "visible";
+        }, 400); // Wait for transition
+        clone = null;
+      }
+    };
 
     // Handle mouse down to start zoom
     img.addEventListener("mousedown", (e: MouseEvent) => {
       if (e.button !== 0) return; // Only left click
       e.preventDefault(); // Prevent default drag
       isPressed = true;
-      img.classList.add("zoomed-in");
       document.body.classList.add("image-zoomed");
+      
+      // 1. Get original position
+      const rect = img.getBoundingClientRect();
+      
+      // 2. Create a clone appended to body to escape stacking contexts
+      clone = document.createElement("img");
+      clone.src = img.src;
+      clone.style.position = "fixed";
+      clone.style.zIndex = "9999999";
+      clone.style.pointerEvents = "none";
+      clone.style.transition = "all 0.4s cubic-bezier(0.2, 0.8, 0.2, 1)";
+      clone.style.transformOrigin = "center center";
+      clone.style.boxShadow = "0 12px 36px rgba(0, 0, 0, 0.2)";
+      clone.style.objectFit = "cover";
+      clone.style.borderRadius = "8px";
+      
+      // Start exactly at original position
+      clone.style.top = `${rect.top}px`;
+      clone.style.left = `${rect.left}px`;
+      clone.style.width = `${rect.width}px`;
+      clone.style.height = `${rect.height}px`;
+      
+      document.body.appendChild(clone);
+      img.style.visibility = "hidden";
+      
+      // 3. Calculate target enlarged dimensions (max 80% viewport)
+      const aspect = img.naturalWidth / img.naturalHeight;
+      let targetW = window.innerWidth * 0.8;
+      let targetH = targetW / aspect;
+      if (targetH > window.innerHeight * 0.8) {
+        targetH = window.innerHeight * 0.8;
+        targetW = targetH * aspect;
+      }
+      
+      // Force layout calculation so the browser applies the start state
+      clone.getBoundingClientRect();
+      
+      // 4. Animate to center and enlarged size
+      clone.style.width = `${targetW}px`;
+      clone.style.height = `${targetH}px`;
+      clone.style.left = `${(window.innerWidth - targetW) / 2}px`;
+      clone.style.top = `${(window.innerHeight - targetH) / 2}px`;
+      clone.style.boxShadow = "0 40px 100px rgba(0, 0, 0, 0.6)";
+
       applyTilt(e);
     });
 
-    // Handle mouse move for dynamic tilt
-    img.addEventListener("mousemove", (e: MouseEvent) => {
-      if (!isPressed) return;
-      applyTilt(e);
-    });
-
-    // Handle release
-    const release = () => {
-      if (!isPressed) return;
-      isPressed = false;
-      img.classList.remove("zoomed-in");
-      document.body.classList.remove("image-zoomed");
-      img.style.transform = "";
-    };
-
-    img.addEventListener("mouseup", release);
-    img.addEventListener("mouseleave", release);
-    window.addEventListener("scroll", release, { passive: true });
-
-    function applyTilt(e: MouseEvent) {
-      // Calculate mouse position relative to the screen center
+    const applyTilt = (e: MouseEvent) => {
+      if (!clone) return;
       const centerX = window.innerWidth / 2;
       const centerY = window.innerHeight / 2;
-      
-      // Calculate tilt based on distance from center (max 8 degrees)
       const tiltX = ((e.clientY - centerY) / centerY) * -8;
       const tiltY = ((e.clientX - centerX) / centerX) * 8;
-      
-      img.style.transform = `perspective(1000px) rotateX(${tiltX}deg) rotateY(${tiltY}deg)`;
-    }
+      clone.style.transform = `perspective(1000px) rotateX(${tiltX}deg) rotateY(${tiltY}deg)`;
+    };
+
+    window.addEventListener("mousemove", (e: MouseEvent) => {
+      if (!isPressed) return;
+      applyTilt(e);
+    });
+
+    window.addEventListener("mouseup", release);
+    window.addEventListener("scroll", release, { passive: true });
   }
 }
 
