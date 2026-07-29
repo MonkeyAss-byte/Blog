@@ -304,12 +304,70 @@ function setupImageZoom() {
   }
 }
 
+// --- 8. Dynamic Custom Cursor ---
+function setupCustomCursor() {
+  if (!window.matchMedia("(pointer: fine)").matches) return; // Only on desktop
+  if (document.getElementById("cursor-dot")) return;
+
+  const dot = document.createElement("div");
+  dot.id = "cursor-dot";
+  const ring = document.createElement("div");
+  ring.id = "cursor-ring";
+  
+  document.body.appendChild(dot);
+  document.body.appendChild(ring);
+  
+  document.body.classList.add("custom-cursor-active");
+
+  let mouseX = window.innerWidth / 2;
+  let mouseY = window.innerHeight / 2;
+  let ringX = mouseX;
+  let ringY = mouseY;
+  let isMoving = false;
+  
+  window.addEventListener("mousemove", (e) => {
+    mouseX = e.clientX;
+    mouseY = e.clientY;
+    dot.style.transform = `translate(calc(${mouseX}px - 50%), calc(${mouseY}px - 50%))`;
+    if (!isMoving) {
+      isMoving = true;
+      requestAnimationFrame(render);
+    }
+  });
+
+  const render = () => {
+    // Lerp for smooth trailing effect
+    ringX += (mouseX - ringX) * 0.15;
+    ringY += (mouseY - ringY) * 0.15;
+    ring.style.transform = `translate(calc(${ringX}px - 50%), calc(${ringY}px - 50%))`;
+    
+    // Stop rendering if ring is very close to mouse to save CPU
+    if (Math.abs(mouseX - ringX) < 0.1 && Math.abs(mouseY - ringY) < 0.1) {
+      isMoving = false;
+    } else {
+      requestAnimationFrame(render);
+    }
+  };
+
+  // Hover magnetic effects
+  window.addEventListener("mouseover", (e) => {
+    const target = e.target as HTMLElement;
+    const isInteractable = target.closest("a, button, input, textarea, .card, article img");
+    if (isInteractable) {
+      ring.classList.add("hovering");
+    } else {
+      ring.classList.remove("hovering");
+    }
+  });
+}
+
 document.addEventListener("nav", () => {
   setupFluentMotion();
   setupMobileInteraction();
   setupDarkmodeTransition();
   setupEdgeBlur();
   setupImageZoom();
+  setupCustomCursor();
 });
 window.addEventListener("DOMContentLoaded", () => {
   setupFluentMotion();
@@ -317,6 +375,7 @@ window.addEventListener("DOMContentLoaded", () => {
   setupDarkmodeTransition();
   setupEdgeBlur();
   setupImageZoom();
+  setupCustomCursor();
 });
 // Run once immediately in case DOM is already loaded
 setupFluentMotion();
@@ -324,4 +383,5 @@ setupMobileInteraction();
 setupDarkmodeTransition();
 setupEdgeBlur();
 setupImageZoom();
+setupCustomCursor();
 
