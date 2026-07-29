@@ -184,14 +184,14 @@ function setupImageZoom() {
         clone.style.left = `${rect.left}px`;
         clone.style.top = `${rect.top}px`;
         // Interpolatable transform so it doesn't snap instantly!
-        clone.style.transform = `perspective(1000px) rotateX(0deg) rotateY(0deg)`;
+        clone.style.transform = `perspective(1000px) rotateX(0deg) rotateY(0deg) scale(1)`;
         clone.style.boxShadow = `none`;
         
         const currentClone = clone;
         setTimeout(() => {
           if (currentClone.parentNode) currentClone.parentNode.removeChild(currentClone);
           img.style.visibility = "visible";
-        }, 400); // Wait for transition
+        }, 450); // Wait slightly longer than transition to ensure it finishes
         clone = null;
       }
     };
@@ -215,6 +215,8 @@ function setupImageZoom() {
       clone.style.transition = "all 0.4s cubic-bezier(0.2, 0.8, 0.2, 1)";
       clone.style.transformOrigin = "center center";
       clone.style.boxShadow = "0 12px 36px rgba(0, 0, 0, 0.2)";
+      clone.style.margin = "0";
+      clone.style.padding = "0";
       
       const computedStyle = window.getComputedStyle(img);
       clone.style.objectFit = computedStyle.objectFit !== 'fill' ? computedStyle.objectFit : 'contain';
@@ -225,6 +227,9 @@ function setupImageZoom() {
       clone.style.left = `${rect.left}px`;
       clone.style.width = `${rect.width}px`;
       clone.style.height = `${rect.height}px`;
+      
+      // explicitly clear transform to prevent mismatch
+      clone.style.transform = `none`; 
       
       document.body.appendChild(clone);
       img.style.visibility = "hidden";
@@ -273,17 +278,27 @@ function setupImageZoom() {
 // --- 8. Dynamic Custom Cursor ---
 function setupCustomCursor() {
   if (!window.matchMedia("(pointer: fine)").matches) return; // Only on desktop
-  if (document.getElementById("fluent-cursor")) return;
-
-  const cursor = document.createElement("div");
-  cursor.id = "fluent-cursor";
-  document.body.appendChild(cursor);
+  
+  let cursor = document.getElementById("fluent-cursor");
+  if (!cursor) {
+    cursor = document.createElement("div");
+    cursor.id = "fluent-cursor";
+    document.body.appendChild(cursor);
+  }
   document.body.classList.add("custom-cursor-active");
 
   let mouseX = (window as any).lastMouseX || window.innerWidth / 2;
   let mouseY = (window as any).lastMouseY || window.innerHeight / 2;
   let cursorX = mouseX;
   let cursorY = mouseY;
+  
+  // Set initial position immediately to prevent top-left flash
+  cursor.style.transform = `translate3d(${cursorX}px, ${cursorY}px, 0) rotateZ(15deg) perspective(600px) rotateX(0deg) rotateY(0deg) scale(1)`;
+
+  // Avoid attaching duplicate event listeners on SPA navigation
+  if ((window as any).fluentCursorSetup) return;
+  (window as any).fluentCursorSetup = true;
+
   let isMoving = false;
   let isPressing = false;
 
@@ -311,10 +326,13 @@ function setupCustomCursor() {
   window.addEventListener("mouseover", (e) => {
     const target = e.target as HTMLElement;
     const isInteractable = target.closest("a, button, input, textarea, .card, article img");
-    if (isInteractable) {
-      cursor.classList.add("hovering");
-    } else {
-      cursor.classList.remove("hovering");
+    const activeCursor = document.getElementById("fluent-cursor");
+    if (activeCursor) {
+      if (isInteractable) {
+        activeCursor.classList.add("hovering");
+      } else {
+        activeCursor.classList.remove("hovering");
+      }
     }
   });
 
@@ -347,12 +365,18 @@ function setupCustomCursor() {
     const tiltX = (velY / 80) * -maxTilt;
     const tiltY = (velX / 80) * maxTilt;
 
-    cursor.style.transform = `translate3d(${cursorX}px, ${cursorY}px, 0) rotateZ(${baseRotation}deg) perspective(600px) rotateX(${tiltX}deg) rotateY(${tiltY}deg) scale(${scale})`;
+    const activeCursor = document.getElementById("fluent-cursor");
+    if (activeCursor) {
+      activeCursor.style.transform = `translate3d(${cursorX}px, ${cursorY}px, 0) rotateZ(${baseRotation}deg) perspective(600px) rotateX(${tiltX}deg) rotateY(${tiltY}deg) scale(${scale})`;
+    }
 
     // Stop animation loop if perfectly still (and not transitioning press state)
     if (Math.abs(dx) < 0.1 && Math.abs(dy) < 0.1 && !isPressing) {
       isMoving = false;
-      cursor.style.transform = `translate3d(${mouseX}px, ${mouseY}px, 0) rotateZ(${baseRotation}deg) perspective(600px) rotateX(0deg) rotateY(0deg) scale(1)`;
+      const activeCursor = document.getElementById("fluent-cursor");
+      if (activeCursor) {
+        activeCursor.style.transform = `translate3d(${mouseX}px, ${mouseY}px, 0) rotateZ(${baseRotation}deg) perspective(600px) rotateX(0deg) rotateY(0deg) scale(1)`;
+      }
     } else {
       requestAnimationFrame(render);
     }
