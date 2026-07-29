@@ -150,44 +150,7 @@ function setupDarkmodeTransition() {
   });
 }
 
-// --- 6. Smooth Viewport Edge Blur ---
-// Uses a real DOM node with mask-image for a perfect gradient blur (distance field)
-function setupEdgeBlur() {
-  if (document.querySelector(".edge-blur-layer")) return; // Already setup
-  
-  // Only apply on desktop to avoid obscuring mobile UI
-  if (window.innerWidth <= 768) return;
-
-  const createSmoothBlur = (isTop: boolean) => {
-    const div = document.createElement("div");
-    div.className = `edge-blur-layer ${isTop ? "top" : "bottom"}`;
-    div.style.position = "fixed";
-    div.style[isTop ? "top" : "bottom"] = "0";
-    div.style.left = "0";
-    div.style.right = "0";
-    div.style.height = "80px"; // Reduced range per user feedback
-    div.style.pointerEvents = "none";
-    div.style.zIndex = "999999";
-    
-    // Moderate blur intensity per user feedback
-    div.style.backdropFilter = "blur(12px)";
-    div.style.webkitBackdropFilter = "blur(12px)";
-    
-    // FADE THE BLUR ITSELF using a mask
-    const direction = isTop ? "to bottom" : "to top";
-    div.style.maskImage = `linear-gradient(${direction}, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 100%)`;
-    div.style.webkitMaskImage = `linear-gradient(${direction}, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 100%)`;
-    
-    // FADE THE TEXT contrast gently by overlaying a semi-transparent background color
-    // We use color-mix to make var(--light) 90% opaque at the very edge, fading to 0%.
-    div.style.background = `linear-gradient(${direction}, color-mix(in srgb, var(--light) 90%, transparent) 0%, transparent 100%)`;
-    
-    return div;
-  };
-
-  document.body.appendChild(createSmoothBlur(true));
-  document.body.appendChild(createSmoothBlur(false));
-}
+// Edge blur removed per user request
 
 // --- 7. Image Long-Press Zoom & Tilt ---
 function setupImageZoom() {
@@ -220,7 +183,8 @@ function setupImageZoom() {
         clone.style.height = `${rect.height}px`;
         clone.style.left = `${rect.left}px`;
         clone.style.top = `${rect.top}px`;
-        clone.style.transform = `none`;
+        // Interpolatable transform so it doesn't snap instantly!
+        clone.style.transform = `perspective(1000px) rotateX(0deg) rotateY(0deg)`;
         clone.style.boxShadow = `none`;
         
         const currentClone = clone;
@@ -319,6 +283,7 @@ function setupCustomCursor() {
   let cursorX = mouseX;
   let cursorY = mouseY;
   let isMoving = false;
+  let isPressing = false;
 
   window.addEventListener("mousemove", (e) => {
     mouseX = e.clientX;
@@ -326,6 +291,26 @@ function setupCustomCursor() {
     if (!isMoving) {
       isMoving = true;
       requestAnimationFrame(render);
+    }
+  });
+  
+  window.addEventListener("mousedown", () => {
+    isPressing = true;
+    if (!isMoving) { isMoving = true; requestAnimationFrame(render); }
+  });
+  
+  window.addEventListener("mouseup", () => {
+    isPressing = false;
+    if (!isMoving) { isMoving = true; requestAnimationFrame(render); }
+  });
+  
+  window.addEventListener("mouseover", (e) => {
+    const target = e.target as HTMLElement;
+    const isInteractable = target.closest("a, button, input, textarea, .card, article img");
+    if (isInteractable) {
+      cursor.classList.add("hovering");
+    } else {
+      cursor.classList.remove("hovering");
     }
   });
 
@@ -343,23 +328,27 @@ function setupCustomCursor() {
     const velY = dy;
 
     // Calculate 3D tilt based on velocity. 
-    // Max tilt is capped at 40 degrees.
-    const maxTilt = 40;
-    const speed = Math.min(Math.sqrt(velX * velX + velY * velY), 60); // Speed cap
+    // Increased max tilt to 45 degrees for a very obvious effect.
+    const maxTilt = 45;
+    const speed = Math.min(Math.sqrt(velX * velX + velY * velY), 80); // Speed cap
     
-    // Scale down slightly when moving fast (depth scale / squish)
-    const scale = 1 - (speed / 60) * 0.15; 
+    // Base 2D rotation for the pointer angle (corrects the drawn SVG to ~30deg)
+    const baseRotation = -15; 
     
+    // Scale down deeply when moving fast (depth squish) and when pressing
+    let scale = 1 - (speed / 80) * 0.25; 
+    if (isPressing) scale *= 0.8; // Click press down effect
+
     // Tilt into the direction of movement
-    const tiltX = (velY / 60) * -maxTilt;
-    const tiltY = (velX / 60) * maxTilt;
+    const tiltX = (velY / 80) * -maxTilt;
+    const tiltY = (velX / 80) * maxTilt;
 
-    cursor.style.transform = `translate3d(${cursorX}px, ${cursorY}px, 0) perspective(400px) rotateX(${tiltX}deg) rotateY(${tiltY}deg) scale(${scale})`;
+    cursor.style.transform = `translate3d(${cursorX}px, ${cursorY}px, 0) rotateZ(${baseRotation}deg) perspective(600px) rotateX(${tiltX}deg) rotateY(${tiltY}deg) scale(${scale})`;
 
-    // Stop animation loop if perfectly still
-    if (Math.abs(dx) < 0.1 && Math.abs(dy) < 0.1) {
+    // Stop animation loop if perfectly still (and not transitioning press state)
+    if (Math.abs(dx) < 0.1 && Math.abs(dy) < 0.1 && !isPressing) {
       isMoving = false;
-      cursor.style.transform = `translate3d(${mouseX}px, ${mouseY}px, 0) perspective(400px) rotateX(0deg) rotateY(0deg) scale(1)`;
+      cursor.style.transform = `translate3d(${mouseX}px, ${mouseY}px, 0) rotateZ(${baseRotation}deg) perspective(600px) rotateX(0deg) rotateY(0deg) scale(1)`;
     } else {
       requestAnimationFrame(render);
     }
@@ -370,7 +359,6 @@ document.addEventListener("nav", () => {
   setupFluentMotion();
   setupMobileInteraction();
   setupDarkmodeTransition();
-  setupEdgeBlur();
   setupImageZoom();
   setupCustomCursor();
 });
@@ -378,7 +366,6 @@ window.addEventListener("DOMContentLoaded", () => {
   setupFluentMotion();
   setupMobileInteraction();
   setupDarkmodeTransition();
-  setupEdgeBlur();
   setupImageZoom();
   setupCustomCursor();
 });
@@ -386,7 +373,6 @@ window.addEventListener("DOMContentLoaded", () => {
 setupFluentMotion();
 setupMobileInteraction();
 setupDarkmodeTransition();
-setupEdgeBlur();
 setupImageZoom();
 setupCustomCursor();
 

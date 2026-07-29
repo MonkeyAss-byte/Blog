@@ -362,5 +362,11 @@ body.image-zoomed {
     will-change: transform;
     /* Optional shadow for depth */
     filter: drop-shadow(0px 4px 4px rgba(0,0,0,0.3));
+    transition: background-image 0.2s ease;
+  }
+
+  #fluent-cursor.hovering {
+    /* Change fill to a nice theme purple (#8b5cf6) on hover */
+    background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Cpath d='M1 1 l 7.5 20.5 l 3.5 -8.5 l 8.5 -3.5 Z' fill='%238b5cf6' stroke='%23FFFFFF' stroke-width='1.5' stroke-linejoin='round'/%3E%3C/svg%3E");
   }
 }
