@@ -215,8 +215,10 @@ function setupImageZoom() {
       clone.style.transition = "all 0.4s cubic-bezier(0.2, 0.8, 0.2, 1)";
       clone.style.transformOrigin = "center center";
       clone.style.boxShadow = "0 12px 36px rgba(0, 0, 0, 0.2)";
-      clone.style.objectFit = "cover";
-      clone.style.borderRadius = "8px";
+      
+      const computedStyle = window.getComputedStyle(img);
+      clone.style.objectFit = computedStyle.objectFit !== 'fill' ? computedStyle.objectFit : 'contain';
+      clone.style.borderRadius = computedStyle.borderRadius;
       
       // Start exactly at original position
       clone.style.top = `${rect.top}px`;
@@ -278,8 +280,8 @@ function setupCustomCursor() {
   document.body.appendChild(cursor);
   document.body.classList.add("custom-cursor-active");
 
-  let mouseX = window.innerWidth / 2;
-  let mouseY = window.innerHeight / 2;
+  let mouseX = (window as any).lastMouseX || window.innerWidth / 2;
+  let mouseY = (window as any).lastMouseY || window.innerHeight / 2;
   let cursorX = mouseX;
   let cursorY = mouseY;
   let isMoving = false;
@@ -288,6 +290,8 @@ function setupCustomCursor() {
   window.addEventListener("mousemove", (e) => {
     mouseX = e.clientX;
     mouseY = e.clientY;
+    (window as any).lastMouseX = mouseX;
+    (window as any).lastMouseY = mouseY;
     if (!isMoving) {
       isMoving = true;
       requestAnimationFrame(render);
@@ -332,8 +336,8 @@ function setupCustomCursor() {
     const maxTilt = 45;
     const speed = Math.min(Math.sqrt(velX * velX + velY * velY), 80); // Speed cap
     
-    // Base 2D rotation for the pointer angle (corrects the drawn SVG to ~30deg)
-    const baseRotation = -15; 
+    // Base 2D rotation for the pointer angle (user requested +15deg)
+    const baseRotation = 15; 
     
     // Scale down deeply when moving fast (depth squish) and when pressing
     let scale = 1 - (speed / 80) * 0.25; 
