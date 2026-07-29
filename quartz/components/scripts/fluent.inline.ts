@@ -289,41 +289,43 @@ function setupCustomCursor() {
 
   let mouseX = (window as any).lastMouseX || window.innerWidth / 2;
   let mouseY = (window as any).lastMouseY || window.innerHeight / 2;
-  let cursorX = mouseX;
-  let cursorY = mouseY;
   
   // Set initial position immediately to prevent top-left flash
-  cursor.style.transform = `translate3d(${cursorX}px, ${cursorY}px, 0) rotateZ(15deg) perspective(600px) rotateX(0deg) rotateY(0deg) scale(1)`;
+  cursor.style.transform = `translate3d(${mouseX}px, ${mouseY}px, 0) rotateZ(15deg) perspective(600px) rotateX(0deg) rotateY(0deg) scale(1)`;
 
-  // Avoid attaching duplicate event listeners on SPA navigation
-  if ((window as any).fluentCursorSetup) return;
-  (window as any).fluentCursorSetup = true;
+  // Clean up old listeners to support SPA navigation and Hot-Reloading
+  if ((window as any).fluentCursorCleanup) {
+    (window as any).fluentCursorCleanup();
+  }
 
+  let cursorX = mouseX;
+  let cursorY = mouseY;
   let isMoving = false;
   let isPressing = false;
+  let rafId = 0;
 
-  window.addEventListener("mousemove", (e) => {
+  const onMouseMove = (e: MouseEvent) => {
     mouseX = e.clientX;
     mouseY = e.clientY;
     (window as any).lastMouseX = mouseX;
     (window as any).lastMouseY = mouseY;
     if (!isMoving) {
       isMoving = true;
-      requestAnimationFrame(render);
+      rafId = requestAnimationFrame(render);
     }
-  });
+  };
   
-  window.addEventListener("mousedown", () => {
+  const onMouseDown = () => {
     isPressing = true;
-    if (!isMoving) { isMoving = true; requestAnimationFrame(render); }
-  });
+    if (!isMoving) { isMoving = true; rafId = requestAnimationFrame(render); }
+  };
   
-  window.addEventListener("mouseup", () => {
+  const onMouseUp = () => {
     isPressing = false;
-    if (!isMoving) { isMoving = true; requestAnimationFrame(render); }
-  });
+    if (!isMoving) { isMoving = true; rafId = requestAnimationFrame(render); }
+  };
   
-  window.addEventListener("mouseover", (e) => {
+  const onMouseOver = (e: MouseEvent) => {
     const target = e.target as HTMLElement;
     const isInteractable = target.closest("a, button, input, textarea, .card, article img");
     const activeCursor = document.getElementById("fluent-cursor");
@@ -334,7 +336,20 @@ function setupCustomCursor() {
         activeCursor.classList.remove("hovering");
       }
     }
-  });
+  };
+
+  window.addEventListener("mousemove", onMouseMove);
+  window.addEventListener("mousedown", onMouseDown);
+  window.addEventListener("mouseup", onMouseUp);
+  window.addEventListener("mouseover", onMouseOver);
+
+  (window as any).fluentCursorCleanup = () => {
+    window.removeEventListener("mousemove", onMouseMove);
+    window.removeEventListener("mousedown", onMouseDown);
+    window.removeEventListener("mouseup", onMouseUp);
+    window.removeEventListener("mouseover", onMouseOver);
+    cancelAnimationFrame(rafId);
+  };
 
   const render = () => {
     // High lerp factor (0.6) for very low latency, almost instant feel
@@ -378,7 +393,7 @@ function setupCustomCursor() {
         activeCursor.style.transform = `translate3d(${mouseX}px, ${mouseY}px, 0) rotateZ(${baseRotation}deg) perspective(600px) rotateX(0deg) rotateY(0deg) scale(1)`;
       }
     } else {
-      requestAnimationFrame(render);
+      rafId = requestAnimationFrame(render);
     }
   };
 }
