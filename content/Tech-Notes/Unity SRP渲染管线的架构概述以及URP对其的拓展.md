@@ -44,26 +44,27 @@ description: 对之前的URP管线的代码表述，进一步对SRP的底层框�
 
 
 > 以上为SRP的最基础的架构，即使没有URP对于Renderer,Pass,RendererFeature的抽象，依然可以通过直接对context进行指令填充，实现简单的渲染管线
-> 
->RenderPipeline.Render(context, cameras[])
-        ↓
-  [逐相机循环]
-        ↓
-  context.SetupCameraProperties(camera)    ← 同步 MVP 矩阵到 GPU
-        ↓
-  camera.TryGetCullingParameters()         ← 准备剔除参数
-        ↓
-  context.Cull()                           ← CPU 侧视锥体/遮挡剔除
-        ↓
-  cmd.ClearRenderTarget()                  ← 清理 FrameBuffer
-        ↓
-  context.DrawRenderers() [Opaque]         ← 不透明物体渲染
-        ↓
-  context.DrawSkybox()                     ← 天空盒渲染
-        ↓
-  context.DrawRenderers() [Transparent]    ← 半透明物体渲染
-        ↓
-  context.Submit()                           ← 将 CommandBuffer 批量提交 GPU 执行
+
+-  RenderPipeline.Render(context, cameras[])
+         ↓
+  - [逐相机循环]
+         ↓
+  - context.SetupCameraProperties(camera)    ← 同步 MVP 矩阵到 GPU
+         ↓
+  - camera.TryGetCullingParameters()         ← 准备剔除参数
+         ↓
+  - context.Cull()                           ← CPU 侧视锥体/遮挡剔除
+         ↓
+  - cmd.ClearRenderTarget()                  ← 清理 FrameBuffer
+         ↓
+  - context.DrawRenderers() [Opaque]         ← 不透明物体渲染
+         ↓
+  - context.DrawSkybox()                     ← 天空盒渲染
+         ↓
+  - context.DrawRenderers() [Transparent]    ← 半透明物体渲染
+        -↓
+  - context.Submit()                           ← 将 CommandBuffer 批量提交 GPU 执行
+
 
 ---
 # URP对SRP的拓展
