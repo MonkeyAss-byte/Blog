@@ -297,16 +297,30 @@ body:has(.center:hover) .edge-blur-layer {
   }
 }
 
-// --- Image Hover Zoom ---
+// --- Image Zoom (Long Press) ---
 article img {
-  transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.3s ease;
+  transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.4s ease;
   transform-origin: center;
+  cursor: zoom-in;
 }
 
-article img:hover {
-  transform: scale(1.03);
+article img:not(.zoomed-in):hover {
+  transform: scale(1.02);
   box-shadow: 0 12px 36px rgba(0, 0, 0, 0.2);
   z-index: 10;
   position: relative;
-  cursor: zoom-in;
 }
+
+article img.zoomed-in {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  translate: -50% -50%; // Center using translate so JS can use transform for tilt
+  max-width: 80vw;
+  max-height: 80vh;
+  z-index: 9999999;
+  box-shadow: 0 20px 80px rgba(0, 0, 0, 0.5), 0 0 0 100vmax rgba(0, 0, 0, 0.6);
+  cursor: zoom-out;
+  margin: 0; // Prevent markdown margins from shifting it
+}
+

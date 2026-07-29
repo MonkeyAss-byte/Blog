@@ -189,21 +189,75 @@ function setupEdgeBlur() {
   document.body.appendChild(createSmoothBlur(false));
 }
 
+// --- 7. Image Long-Press Zoom & Tilt ---
+function setupImageZoom() {
+  const images = document.querySelectorAll("article img") as NodeListOf<HTMLElement>;
+  
+  for (const img of images) {
+    if (img.dataset.zoomInit) continue;
+    img.dataset.zoomInit = "true";
+    
+    let isPressed = false;
+
+    // Handle mouse down to start zoom
+    img.addEventListener("mousedown", (e: MouseEvent) => {
+      if (e.button !== 0) return; // Only left click
+      e.preventDefault(); // Prevent default drag
+      isPressed = true;
+      img.classList.add("zoomed-in");
+      applyTilt(e);
+    });
+
+    // Handle mouse move for dynamic tilt
+    img.addEventListener("mousemove", (e: MouseEvent) => {
+      if (!isPressed) return;
+      applyTilt(e);
+    });
+
+    // Handle release
+    const release = () => {
+      if (!isPressed) return;
+      isPressed = false;
+      img.classList.remove("zoomed-in");
+      img.style.transform = "";
+    };
+
+    img.addEventListener("mouseup", release);
+    img.addEventListener("mouseleave", release);
+    window.addEventListener("scroll", release, { passive: true });
+
+    function applyTilt(e: MouseEvent) {
+      // Calculate mouse position relative to the screen center
+      const centerX = window.innerWidth / 2;
+      const centerY = window.innerHeight / 2;
+      
+      // Calculate tilt based on distance from center (max 8 degrees)
+      const tiltX = ((e.clientY - centerY) / centerY) * -8;
+      const tiltY = ((e.clientX - centerX) / centerX) * 8;
+      
+      img.style.transform = `perspective(1000px) rotateX(${tiltX}deg) rotateY(${tiltY}deg)`;
+    }
+  }
+}
+
 document.addEventListener("nav", () => {
   setupFluentMotion();
   setupMobileInteraction();
   setupDarkmodeTransition();
   setupEdgeBlur();
+  setupImageZoom();
 });
 window.addEventListener("DOMContentLoaded", () => {
   setupFluentMotion();
   setupMobileInteraction();
   setupDarkmodeTransition();
   setupEdgeBlur();
+  setupImageZoom();
 });
 // Run once immediately in case DOM is already loaded
 setupFluentMotion();
 setupMobileInteraction();
 setupDarkmodeTransition();
 setupEdgeBlur();
+setupImageZoom();
 
