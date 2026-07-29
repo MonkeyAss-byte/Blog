@@ -193,6 +193,14 @@ function setupEdgeBlur() {
 function setupImageZoom() {
   const images = document.querySelectorAll("article img") as NodeListOf<HTMLElement>;
   
+  // Create overlay if it doesn't exist
+  let overlay = document.getElementById("zoom-overlay");
+  if (!overlay) {
+    overlay = document.createElement("div");
+    overlay.id = "zoom-overlay";
+    document.body.appendChild(overlay);
+  }
+
   for (const img of images) {
     if (img.dataset.zoomInit) continue;
     img.dataset.zoomInit = "true";
@@ -205,6 +213,7 @@ function setupImageZoom() {
       e.preventDefault(); // Prevent default drag
       isPressed = true;
       img.classList.add("zoomed-in");
+      document.body.classList.add("image-zoomed");
       applyTilt(e);
     });
 
@@ -219,6 +228,7 @@ function setupImageZoom() {
       if (!isPressed) return;
       isPressed = false;
       img.classList.remove("zoomed-in");
+      document.body.classList.remove("image-zoomed");
       img.style.transform = "";
     };
 

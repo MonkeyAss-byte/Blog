@@ -316,11 +316,31 @@ article img.zoomed-in {
   top: 50%;
   left: 50%;
   translate: -50% -50%; // Center using translate so JS can use transform for tilt
-  max-width: 80vw;
-  max-height: 80vh;
+  width: 80vw;
+  height: 80vh;
+  object-fit: contain; // This ensures it actually enlarges small images without distortion
   z-index: 9999999;
-  box-shadow: 0 20px 80px rgba(0, 0, 0, 0.5), 0 0 0 100vmax rgba(0, 0, 0, 0.6);
+  box-shadow: 0 40px 100px rgba(0, 0, 0, 0.6);
   cursor: zoom-out;
   margin: 0; // Prevent markdown margins from shifting it
+}
+
+// Background Blur Overlay
+#zoom-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0);
+  backdrop-filter: blur(0px);
+  -webkit-backdrop-filter: blur(0px);
+  pointer-events: none;
+  z-index: 9999998;
+  transition: all 0.4s ease;
+}
+
+body.image-zoomed #zoom-overlay {
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  pointer-events: all;
 }
 
