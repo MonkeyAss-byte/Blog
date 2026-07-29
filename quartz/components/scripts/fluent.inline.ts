@@ -355,7 +355,7 @@ function setupCustomCursor() {
   };
 
   const render = () => {
-    // High lerp factor (0.6) for position keeps latency very low
+    // High lerp factor (0.6) keeps latency very low while still allowing velocity calculation
     const lerp = 0.6; 
     const dx = mouseX - cursorX;
     const dy = mouseY - cursorY;
@@ -363,39 +363,40 @@ function setupCustomCursor() {
     cursorX += dx * lerp;
     cursorY += dy * lerp;
 
-    // Use instantaneous dx/dy to calculate target tilt.
-    // We use a small divisor (20) so even normal mouse movements create a strong target tilt.
-    const maxTilt = 45;
-    let targetTiltX = (dy / 20) * -maxTilt;
-    let targetTiltY = (dx / 20) * maxTilt;
+    // Use instantaneous dx/dy to calculate speed and movement angle
+    const speed = Math.min(Math.sqrt(dx * dx + dy * dy), 50);
     
-    // Clamp target tilt
-    targetTiltX = Math.max(-maxTilt, Math.min(maxTilt, targetTiltX));
-    targetTiltY = Math.max(-maxTilt, Math.min(maxTilt, targetTiltY));
+    // Calculate movement angle in degrees for the directional squish
+    let moveAngle = Math.atan2(dy, dx) * (180 / Math.PI);
+    if (speed < 1) {
+      // If practically still, keep the last angle to prevent snapping back to 0
+      moveAngle = (window as any).lastMoveAngle || 0;
+    } else {
+      (window as any).lastMoveAngle = moveAngle;
+    }
 
-    // THE SECRET SAUCE: Independently smooth the tilt with a low lerp (0.15)
-    // This allows the cursor position to instantly track the mouse, 
-    // but the 3D tilt "hangs" and acts like a physical spring!
-    currentTiltX += (targetTiltX - currentTiltX) * 0.15;
-    currentTiltY += (targetTiltY - currentTiltY) * 0.15;
-
-    // Scale calculation (squish when moving fast, or clicking)
-    const speed = Math.min(Math.sqrt(dx * dx + dy * dy), 30);
-    let targetScale = 1 - (speed / 30) * 0.15;
-    if (isPressing) targetScale *= 0.8;
+    // THE SECRET SAUCE: Squash and Stretch (Fluent Jelly Physics)
+    // When moving fast, stretch along the velocity vector and squish perpendicular to it.
+    // We increase stretch up to 1.3x and squish down to 0.7x
+    const stretch = 1 + (speed / 50) * 0.4;
+    const squish = 1 - (speed / 50) * 0.3;
     
-    currentScale += (targetScale - currentScale) * 0.2;
+    // Base scale handles the click press-down effect
+    let targetBaseScale = isPressing ? 0.7 : 1;
+    currentScale += (targetBaseScale - currentScale) * 0.3; // Smooth click bounce
 
     const activeCursor = document.getElementById("fluent-cursor");
     if (activeCursor) {
-      activeCursor.style.transform = `perspective(600px) translate3d(${cursorX}px, ${cursorY}px, 0) rotateZ(15deg) rotateX(${currentTiltX}deg) rotateY(${currentTiltY}deg) scale(${currentScale})`;
+      // To stretch along an arbitrary vector: rotate to the vector, scale, then rotate back!
+      // Finally, apply the user's requested +15deg base pointer angle.
+      activeCursor.style.transform = `translate3d(${cursorX}px, ${cursorY}px, 0) rotateZ(${moveAngle}deg) scale(${stretch * currentScale}, ${squish * currentScale}) rotateZ(${-moveAngle}deg) rotateZ(15deg)`;
     }
 
     // Stop animation loop if everything has settled
-    if (Math.abs(dx) < 0.1 && Math.abs(dy) < 0.1 && Math.abs(currentTiltX) < 0.1 && Math.abs(currentTiltY) < 0.1 && Math.abs(currentScale - (isPressing ? 0.8 : 1)) < 0.01) {
+    if (Math.abs(dx) < 0.1 && Math.abs(dy) < 0.1 && Math.abs(currentScale - (isPressing ? 0.7 : 1)) < 0.01) {
       isMoving = false;
       if (activeCursor) {
-        activeCursor.style.transform = `perspective(600px) translate3d(${mouseX}px, ${mouseY}px, 0) rotateZ(15deg) rotateX(0deg) rotateY(0deg) scale(${isPressing ? 0.8 : 1})`;
+        activeCursor.style.transform = `translate3d(${mouseX}px, ${mouseY}px, 0) rotateZ(${moveAngle}deg) scale(${currentScale}, ${currentScale}) rotateZ(${-moveAngle}deg) rotateZ(15deg)`;
       }
     } else {
       rafId = requestAnimationFrame(render);
