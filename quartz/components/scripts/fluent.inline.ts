@@ -300,6 +300,9 @@ function setupCustomCursor() {
 
   let cursorX = mouseX;
   let cursorY = mouseY;
+  let currentTiltX = 0;
+  let currentTiltY = 0;
+  let currentScale = 1;
   let isMoving = false;
   let isPressing = false;
   let rafId = 0;
@@ -352,7 +355,7 @@ function setupCustomCursor() {
   };
 
   const render = () => {
-    // High lerp factor (0.6) for very low latency, almost instant feel
+    // High lerp factor (0.6) for position keeps latency very low
     const lerp = 0.6; 
     const dx = mouseX - cursorX;
     const dy = mouseY - cursorY;
@@ -360,37 +363,39 @@ function setupCustomCursor() {
     cursorX += dx * lerp;
     cursorY += dy * lerp;
 
-    // Velocity for tilt
-    const velX = dx;
-    const velY = dy;
-
-    // Calculate 3D tilt based on velocity. 
-    // Increased max tilt to 45 degrees for a very obvious effect.
+    // Use instantaneous dx/dy to calculate target tilt.
+    // We use a small divisor (20) so even normal mouse movements create a strong target tilt.
     const maxTilt = 45;
-    const speed = Math.min(Math.sqrt(velX * velX + velY * velY), 80); // Speed cap
+    let targetTiltX = (dy / 20) * -maxTilt;
+    let targetTiltY = (dx / 20) * maxTilt;
     
-    // Base 2D rotation for the pointer angle (user requested +15deg)
-    const baseRotation = 15; 
-    
-    // Scale down deeply when moving fast (depth squish) and when pressing
-    let scale = 1 - (speed / 80) * 0.25; 
-    if (isPressing) scale *= 0.8; // Click press down effect
+    // Clamp target tilt
+    targetTiltX = Math.max(-maxTilt, Math.min(maxTilt, targetTiltX));
+    targetTiltY = Math.max(-maxTilt, Math.min(maxTilt, targetTiltY));
 
-    // Tilt into the direction of movement
-    const tiltX = (velY / 80) * -maxTilt;
-    const tiltY = (velX / 80) * maxTilt;
+    // THE SECRET SAUCE: Independently smooth the tilt with a low lerp (0.15)
+    // This allows the cursor position to instantly track the mouse, 
+    // but the 3D tilt "hangs" and acts like a physical spring!
+    currentTiltX += (targetTiltX - currentTiltX) * 0.15;
+    currentTiltY += (targetTiltY - currentTiltY) * 0.15;
+
+    // Scale calculation (squish when moving fast, or clicking)
+    const speed = Math.min(Math.sqrt(dx * dx + dy * dy), 30);
+    let targetScale = 1 - (speed / 30) * 0.15;
+    if (isPressing) targetScale *= 0.8;
+    
+    currentScale += (targetScale - currentScale) * 0.2;
 
     const activeCursor = document.getElementById("fluent-cursor");
     if (activeCursor) {
-      activeCursor.style.transform = `translate3d(${cursorX}px, ${cursorY}px, 0) rotateZ(${baseRotation}deg) perspective(600px) rotateX(${tiltX}deg) rotateY(${tiltY}deg) scale(${scale})`;
+      activeCursor.style.transform = `translate3d(${cursorX}px, ${cursorY}px, 0) rotateZ(15deg) perspective(600px) rotateX(${currentTiltX}deg) rotateY(${currentTiltY}deg) scale(${currentScale})`;
     }
 
-    // Stop animation loop if perfectly still (and not transitioning press state)
-    if (Math.abs(dx) < 0.1 && Math.abs(dy) < 0.1 && !isPressing) {
+    // Stop animation loop if everything has settled
+    if (Math.abs(dx) < 0.1 && Math.abs(dy) < 0.1 && Math.abs(currentTiltX) < 0.1 && Math.abs(currentTiltY) < 0.1 && Math.abs(currentScale - (isPressing ? 0.8 : 1)) < 0.01) {
       isMoving = false;
-      const activeCursor = document.getElementById("fluent-cursor");
       if (activeCursor) {
-        activeCursor.style.transform = `translate3d(${mouseX}px, ${mouseY}px, 0) rotateZ(${baseRotation}deg) perspective(600px) rotateX(0deg) rotateY(0deg) scale(1)`;
+        activeCursor.style.transform = `translate3d(${mouseX}px, ${mouseY}px, 0) rotateZ(15deg) perspective(600px) rotateX(0deg) rotateY(0deg) scale(${isPressing ? 0.8 : 1})`;
       }
     } else {
       rafId = requestAnimationFrame(render);
