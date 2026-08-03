@@ -87,7 +87,8 @@ description: 对之前的URP管线的代码表述，进一步对SRP的底层框�
 
 ##### 方法
 - `CreatePipeline(this)` 
-  - 核心逻辑：`{ rendererdata.create() added }`
+  - 核心逻辑：
+    1. `rendererdata.create()` added
   
 ---
 
@@ -102,9 +103,21 @@ description: 对之前的URP管线的代码表述，进一步对SRP的底层框�
 
 ##### 方法
 - `Render(...)` 
-  - 核心逻辑：`{ **sortCameras** (深度+是否渲染到 RenderTexture) -> **RenderCameraStack**(Base), for x in **Base.cameraStack，RenderSingleCamera**(x) }`
+  - **核心逻辑执行流：**
+    1. `sortCameras` (深度 + 是否渲染到 RenderTexture)
+    2. `RenderCameraStack(Base)`
+    3. `for x in Base.cameraStack`: 
+       - `RenderSingleCamera(x)`
 - `RenderSingleCamera(...)`
-  - 核心逻辑：`{ TryGetCullingParameters -> context.Cull() -> 读取 camera.UniversalAdditionalCameraData -> 获取绑定 Renderer (从 asset 获得) -> 装配 renderingData -> renderer.AddRenderPasses (foreach features.AddRenderPasses) -> renderer.Setup(context, ref renderingData) -> renderer.Execute(context, ref renderingData) }`
+  - **核心逻辑执行流：**
+    1. `TryGetCullingParameters`
+    2. `context.Cull()`
+    3. 读取 `camera.UniversalAdditionalCameraData`
+    4. 获取绑定 `Renderer` (从 asset 获得)
+    5. 装配 `renderingData`
+    6. `renderer.AddRenderPasses` (内部触发 `foreach features.AddRenderPasses`)
+    7. `renderer.Setup(context, ref renderingData)`
+    8. `renderer.Execute(context, ref renderingData)`
 - ...
   
 ---
@@ -131,16 +144,35 @@ description: 对之前的URP管线的代码表述，进一步对SRP的底层框�
 
 ##### 构造方法
 - `Renderer(...)`
-  - 核心逻辑：`{ new xxxpass(...)..., this.asset = asset }`
+  - **核心逻辑执行流：**
+    1. `new xxxpass(...)` 等...
+    2. `this.asset = asset`
 
 ##### 方法
 - `Execute(...)`
-  - 核心逻辑：`{ for pass in passes, pass.OnCameraSetup(...) -> context.ExecuteCommandBuffer(cmd) -> SortStable(passes) by renderpassEvent -> SetBlockRanges(设置每个 Block 包括的 passIndexRange, 一般共四个) -> for pass in passes, pass.Configure(...) -> ExecuteBlock(...) { for pass in passesInBlock, setRendererPassAttachments(...(判断并懒设置 RenderTarget)), pass.Execute(...) } four times (**BeforeRendering**，**MainRenderingOpaque**，**MainRenderingTransparent**，**AfterRendering**) -> for pass in passes, pass.OnCameraCleanup(...) }`
+  - **核心逻辑执行流：**
+    1. `for pass in passes`: 
+       - `pass.OnCameraSetup(...)`
+    2. `context.ExecuteCommandBuffer(cmd)`
+    3. `SortStable(passes)` by `renderpassEvent`
+    4. `SetBlockRanges` (设置每个 Block 包括的 passIndexRange, 一般共四个)
+    5. `for pass in passes`:
+       - `pass.Configure(...)`
+    6. `ExecuteBlock(...)` 循环四次 (**BeforeRendering**，**MainRenderingOpaque**，**MainRenderingTransparent**，**AfterRendering**)：
+       - `for pass in passesInBlock`:
+         - `setRendererPassAttachments(...)` (判断并懒设置 RenderTarget)
+         - `pass.Execute(...)`
+    7. `for pass in passes`:
+       - `pass.OnCameraCleanup(...)`
 
 #### 1.1.2 抽象成员
 ##### 方法
 - `Setup(...)`
-  - 核心逻辑：`{ alloc cameraTarget from cameraData -> alloc RT and passes from passes in features configureinput + Enqueue(xxxpass) + features.SetupRenderPasses(...) }`
+  - **核心逻辑执行流：**
+    1. alloc `cameraTarget` from `cameraData`
+    2. alloc RT and passes form passes in features `configureinput`
+    3. `Enqueue(xxxpass)`
+    4. `features.SetupRenderPasses(...)`
 
 ---
 
