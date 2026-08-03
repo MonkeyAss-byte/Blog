@@ -90,9 +90,9 @@ description: 对之前的URP管线的代码表述，进一步对SRP的底层框�
 - ...
 #### 方法
 - Render(...) 
-  {**sortCameras**(深度+是否渲染到RenderTexture)->**RenderSingleCamera**(Base),  for x in **Base.cameraStack，RenderSingleCamera**(x) }
+  {**sortCameras**(深度+是否渲染到RenderTexture)->**RenderCameraStack**(Base),  for x in **Base.cameraStack，RenderSingleCamera**(x) }
 - RenderSingleCamera(...)
-  {TryGetCullingParameters->context.cull->读取camera.UniversalAdditionalCameraData->获取绑定Renderer(从asset获得)->装配renderingdata->renderer.Setup(context,ref renderingData)->renderer.Execute(context,ref renderingData) }
+  {TryGetCullingParameters->context.cull->读取camera.UniversalAdditionalCameraData->获取绑定Renderer(从asset获得)->装配renderingdata->renderer.AddRenderpass（foreach features.addrenderpasses)->renderer.Setup(context,ref renderingData)->renderer.Execute(context,ref renderingData) }
 - ...
   
 ## 三、ScriptableRendererData
@@ -112,7 +112,7 @@ description: 对之前的URP管线的代码表述，进一步对SRP的底层框�
 - asset
 #### 方法
 - Execute(...)
-  {for pass in passes,pass.OnCameraSetup(...)->context.ExecuteCommandBuffer(cmd)->SortStable(passes) by renderpassEvent->for pass in passes,pass.Configure(...)->sfor pass in passes,setRendererPassAttachments(...(判断并懒设置RenderTarget)),pass.Execute(...)->for pass in passes,pass.OnCameraCleanup(...)}
+  {for pass in passes,pass.OnCameraSetup(...)->context.ExecuteCommandBuffer(cmd)->SortStable(passes) by renderpassEvent->SetBlockRanges(设置每个Block包括的passIndexRange,一般共四个)->for pass in passes,pass.Configure(...)->ExecuteBlock(...) {for pass in passesinBlock,setRendererPassAttachments(...(判断并懒设置RenderTarget)),pass.Execute(...)} four times（**BeforeRendering**，**MainRenderingOpaque**，**MainRenderingTransparent**，**AfterRendering**）->for pass in passes,pass.OnCameraCleanup(...)}
   
 #### 构造方法
 - Renderer(...)
@@ -120,7 +120,115 @@ description: 对之前的URP管线的代码表述，进一步对SRP的底层框�
 #### 1.1.2 抽象成员
 #### 方法
 - Setup(...)
-  {Enqueue(xxxpass)+asset.features.AddRenderPasses}
+  {alloc cameraTarget andfrom cameraData->alloc RT and passes form passes in features configureinput+Enqueue(xxxpass)+features.setuprenderpasses(...)}
 
 ## 四、ScriptableRenderPass
+### 1.1 成员
+#### 1.1.1  正常成员
+#### 属性
+- colorAttachments
+- depthAttachment
+- clearFlag
+- clearColor
+- renderpassEvent
+- m_Input
+- ...
+#### 方法
+- ConfigureTarget()
+- ConfigureClear()
+- ConfigureInput()
+  
+
+#### 1.1.2 抽象成员
+#### 方法
+- Execute(...)
+#### 1.1.2 虚拟成员
+
+#### 方法
+- OnCameraSetup(...)
+- Configure(...)
+- OnCameraCleanup(...)
+- ResetRenderTarget(...)
 ## 五、ScriptableRendererFeature
+### 1.1 成员
+
+#### 1.1.1 抽象成员
+#### 方法
+- Create(...)
+- AddRenderPasses(...)
+#### 1.1.2 虚拟成员
+
+#### 方法
+- SetupRenderpasses(...)
+- Dispose(...)
+  
+
+
+  
+> 以上对于URP的***必要的部分与原理*** 进行了理解与分析，以下分别为实例化渲染管线与每帧渲染的精简示意图
+
+
+
+```mermaid
+graph TD
+    A[Project Settings] -->|在 Graphics 槽位中分配| B(UniversalRenderPipelineAsset)
+    
+    B -.->|Unity 底层事件触发| C[RenderPipelineManager]
+    C -->|1. 请求创建管线实例| D(Asset.CreatePipeline)
+    
+    D -->|2. 提取并调用| E[Asset.CreateRenderers]
+    E -->|3. 根据传入的 RendererData| F(实例化 UniversalRenderer)
+    
+    F -.->|4. Renderer 构造时, 提取 Data 里的 Features| G[遍历 ScriptableRendererFeature]
+    G -.->|5. 触发 Feature 生命周期的第一步| H(feature.Create)
+    
+    H -.->|6. 开发者手写逻辑| I[new MyCustomPass: 实例化 Pass]
+```
+
+
+>  ***以上为管线实例化过程***
+
+
+```mermaid
+graph TD
+    A[UniversalRenderPipeline.Render 传入多个摄像机] --> B(1. SortCameras: 按 TargetTexture 有无 以及 Depth 大小排序)
+    B --> C[2. 主循环：遍历所有 Camera]
+    
+    C --> D{检查 Camera 的 RenderType}
+    
+    D -- Overlay --> E[直接忽略跳过<br>不能作为独立主入口]
+    
+    D -- Base --> F[3. 进入 RenderCameraStack]
+    
+    F -.-> G[3.1 执行 RenderSingleCamera<br>渲染 Base 摄像机本身]
+    G -.-> H[3.2 遍历 Base 相机的 cameraStack]
+    H -.-> I[3.3 依次执行 RenderSingleCamera<br>渲染叠加的 Overlay 摄像机]
+```
+
+
+>  ***以上为在RenderSingleCamera之前的相机排序过程***
+  
+```mermaid
+graph LR
+    A[RenderSingleCamera] --> B(1. renderer.AddRenderPasses)
+    A --> C(2. renderer.Setup)
+    A --> D(3. renderer.Execute)
+    
+    B -.-> B1[Feature.AddRenderPasses]
+    B1 -.-> B2[1. 声明需求 ConfigureInput<br>2. 占位入队 EnqueuePass<br>状态: 拿着假Target]
+    
+    C -.-> C1[遍历队列查需求 pass.input]
+    C1 -.-> C2[根据需求分配真实 RenderTarget]
+    C2 -.-> C3[官方基础 Pass 入队]
+    C3 -.-> C4[Feature.SetupRenderPasses]
+    C4 -.-> C5[拿到真实Target, 替换Pass中的假Target]
+    
+    D -.-> D1[SortStable: 按 Event 全局排序]
+    D1 -.-> D2[Block 归纳: 划定 startIndex 与 endIndex]
+    D2 -.-> D3[调用所有 Pass 的 Configure]
+    D3 -.-> D4[按 Block 顺序执行]
+    D4 -.-> D5[Block 内循环: 懒设置 SetRenderTarget]
+    D5 -.-> D6[调用 pass.Execute]
+```
+
+>  ***以上为在RenderSingleCamera之后的URP的渲染过程***
