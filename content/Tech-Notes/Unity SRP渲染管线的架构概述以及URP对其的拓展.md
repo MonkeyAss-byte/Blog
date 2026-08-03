@@ -22,7 +22,7 @@ description: 对之前的URP管线的代码表述，进一步对SRP的底层框�
 
 ### 1.1 成员
 #### 1.1.1 虚拟成员
-#### 属性(get)
+#### 属性(get;set;)
  - defaultMaterial(在编辑器中物体的默认material)
  - defaultShader(在编辑器中物体的默认shader)
  - renderPipelineShaderTag(对应于shaderlab的renderpipline tag)
@@ -36,7 +36,6 @@ description: 对之前的URP管线的代码表述，进一步对SRP的底层框�
 
 
 ## 三、RenderPipeline
-
 #### 关键方法
 - **RenderInternal(context,cameras)** (调用Render)
 - **Render(context,cameras)(abstract)**
@@ -74,7 +73,54 @@ description: 对之前的URP管线的代码表述，进一步对SRP的底层框�
 ---
 
 ## 一、UniversalRenderPipelineAsset
+### 1.1 关键改动或新增
+#### 1.1.1 成员
+#### 字段
+- m_RendererDataList
+- m_Renderers
+#### 方法
+- CreatePipeline(this) 
+  {rendererdata.create() added}
+  
 ## 二、UniversalRenderPipeline
+### 1.1 关键改动或新增
+#### 1.1.1 成员
+#### 属性
+- asset(pipelineAsset)
+- ...
+#### 方法
+- Render(...) 
+  {**sortCameras**(深度+是否渲染到RenderTexture)->**RenderSingleCamera**(Base),  for x in **Base.cameraStack，RenderSingleCamera**(x) }
+- RenderSingleCamera(...)
+  {TryGetCullingParameters->context.cull->读取camera.UniversalAdditionalCameraData->获取绑定Renderer(从asset获得)->装配renderingdata->renderer.Setup(context,ref renderingData)->renderer.Execute(context,ref renderingData) }
+- ...
+  
+## 三、ScriptableRendererData
+### 1.1 成员
+#### 1.1.1 正常成员
+##### 属性
+- rendererFeatures（SO）
+#### 1.1.2  抽象成员
+##### 方法
+- **Create(this) (实例化Renderer)**
+
+
 ## 三、ScriptableRenderer
+### 1.1 成员
+#### 1.1.1  正常成员
+#### 字段
+- asset
+#### 方法
+- Execute(...)
+  {for pass in passes,pass.OnCameraSetup(...)->context.ExecuteCommandBuffer(cmd)->SortStable(passes) by renderpassEvent->for pass in passes,pass.Configure(...)->sfor pass in passes,setRendererPassAttachments(...(判断并懒设置RenderTarget)),pass.Execute(...)->for pass in passes,pass.OnCameraCleanup(...)}
+  
+#### 构造方法
+- Renderer(...)
+  {new xxxpass(...)..., this.asset=aseet}
+#### 1.1.2 抽象成员
+#### 方法
+- Setup(...)
+  {Enqueue(xxxpass)+asset.features.AddRenderPasses}
+
 ## 四、ScriptableRenderPass
 ## 五、ScriptableRendererFeature
