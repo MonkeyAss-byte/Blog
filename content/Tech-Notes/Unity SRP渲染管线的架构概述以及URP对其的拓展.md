@@ -209,7 +209,7 @@ graph TD
 >  ***以上为在RenderSingleCamera之前的相机排序过程***
   
 ```mermaid
-graph LR
+graph 
     A["RenderSingleCamera"] --> B("1. renderer.AddRenderPasses")
     A --> C("2. renderer.Setup")
     A --> D("3. renderer.Execute")
