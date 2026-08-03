@@ -209,26 +209,27 @@ graph TD
 >  ***以上为在RenderSingleCamera之前的相机排序过程***
   
 ```mermaid
-graph 
-    A["RenderSingleCamera"] --> B("1. renderer.AddRenderPasses")
-    A --> C("2. renderer.Setup")
-    A --> D("3. renderer.Execute")
+graph TD
+    A[RenderSingleCamera] --> B(① renderer.AddRenderPasses)
+    A --> C(② renderer.Setup)
+    A --> D(③ renderer.Execute)
     
-    B -.-> B1["Feature.AddRenderPasses"]
-    B1 -.-> B2["1. 声明需求 ConfigureInput<br>2. 占位入队 EnqueuePass<br>状态: 拿着假Target"]
+    B -.-> B1[Feature.AddRenderPasses]
+    B1 -.-> B2[① 声明需求 ConfigureInput<br>② 占位入队 EnqueuePass<br>状态: 拿着假Target]
     
-    C -.-> C1["遍历队列查需求 pass.input"]
-    C1 -.-> C2["根据需求分配真实 RenderTarget"]
-    C2 -.-> C3["官方基础 Pass 入队"]
-    C3 -.-> C4["Feature.SetupRenderPasses"]
-    C4 -.-> C5["拿到真实Target, 替换Pass中的假Target"]
+    C -.-> C1[遍历队列查需求 pass.input]
+    C1 -.-> C2[根据需求分配真实 RenderTarget]
+    C2 -.-> C3[官方基础 Pass 入队]
+    C3 -.-> C4[Feature.SetupRenderPasses]
+    C4 -.-> C5[拿到真实Target, 替换Pass中的假Target]
     
-    D -.-> D1["SortStable: 按 Event 全局排序"]
-    D1 -.-> D2["Block 归纳: 划定 startIndex 与 endIndex"]
-    D2 -.-> D3["调用所有 Pass 的 Configure"]
-    D3 -.-> D4["按 Block 顺序执行"]
-    D4 -.-> D5["Block 内循环: 懒设置 SetRenderTarget"]
-    D5 -.-> D6["调用 pass.Execute"]
+    D -.-> D1[SortStable: 按 Event 全局排序]
+    D1 -.-> D2[Block 归纳: 划定 startIndex 与 endIndex]
+    D2 -.-> D3[调用所有 Pass 的 Configure]
+    D3 -.-> D4[按 Block 顺序执行]
+    D4 -.-> D5[Block 内循环: 懒设置 SetRenderTarget]
+    D5 -.-> D6[调用 pass.Execute]
+
 ```
 
 
