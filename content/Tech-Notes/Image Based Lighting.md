@@ -15,7 +15,7 @@ description: 对于双向分布函数的IBL的工程实现
 - 球谐函数是一组全球空间的基函数
 #### 数学基础
 - 对于基函数的投影系数：$$c_l = \int_{\Omega} f(\omega) \cdot Y_l(\omega) \, d\omega$$
-- 旋转不变性：
+- 可进行旋转变换（基于球谐函数的线性组合拟合以及球谐函数的旋转不变性）：
   $$
   	R=\begin{pmatrix}
 		R_{x x}&R_{xy}&R_{xz}\\R_{y x}&R_{yy}&R_{yz}\\R_{z x}&R_{zy}&R_{zz}
