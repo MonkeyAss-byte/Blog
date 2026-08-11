@@ -16,7 +16,7 @@ description: 基于球谐函数的 BSDF 材质工作流技术拆解，涵盖 SH 
 
 ```mermaid
 	graph TD
-    subgraph BSDF工作流全景图
+    subgraph Main [BSDF工作流全景图]
         direction TD
         
         A["① 球谐深度烘焙<br/><br/>Cubemap → SH 系数<br/>→ Vertex UV2/3/4"]
@@ -33,11 +33,11 @@ description: 基于球谐函数的 BSDF 材质工作流技术拆解，涵盖 SH 
         D --> E
     end
     
-    classDef precompute fill:#2d3748,stroke:#4a5568,stroke-width:2px,color:#fff;
-    classDef render fill:#2b6cb0,stroke:#3182ce,stroke-width:2px,color:#fff;
+    classDef precompute fill:#2d3748,stroke:#4a5568,stroke-width:2px,color:#fff
+    classDef render fill:#2b6cb0,stroke:#3182ce,stroke-width:2px,color:#fff
     
-    class A,B,C precompute;
-    class D,E render;
+    class A,B,C precompute
+    class D,E render
 ```
 
 ## 一、球谐深度烘焙（Cubemap → SH → 顶点信息）
