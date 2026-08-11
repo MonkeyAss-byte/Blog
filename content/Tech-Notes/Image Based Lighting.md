@@ -13,7 +13,6 @@ description: 对于双向分布函数的IBL的工程实现
 ## 漫反射
 ### 球谐函数
 - 球谐函数是一组全球空间的基函数
-#### 数学基础
 - 对于基函数的投影系数：$$c_l = \int_{\Omega} f(\omega) \cdot Y_l(\omega) \, d\omega$$
 - 可进行旋转变换（基于球谐函数的线性组合拟合以及球谐函数的旋转不变性）：
   $$
@@ -32,4 +31,18 @@ description: 对于双向分布函数的IBL的工程实现
 	\end{pmatrix}
   $$
 	同理，对于三阶的基函数，同样是通过提取多项式中的原基函数的系数建立矩阵（5x5)
+#### 球面卷积
+- 卷积个人理解：对原函数进行相对位置的积分处理得到一个新函数
+- $Irradiance_{IBL_diffuse}$公式：
+  $$
+  	E(n)=\int L_{i}(w)\cdot max(0,n\cdot \omega )d\omega 
+  $$
+- 对于球谐基函数或傅里叶基函数此类频域的基函数来说，卷积操作等于基函数系数相乘(**基于基底正交性推导**），即：
+  $$
+  	E(n)=\begin{pmatrix}
+		f_{0,0}\\f_{-1,0\\}\\f_{-1,0}\\\dots
+	\end{pmatrix}\cdot \begin{pmatrix}
+		f(n)_{0,0}&f(n)_{-1,0\\}&f(n)_{-1,0}&\dots
+	\end{pmatrix}
+  $$
 
