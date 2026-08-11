@@ -104,21 +104,16 @@ LUT 布局: 128×128
 
 积分步骤:
   1. 将曲率转为球面半径 R = 1 / curvature
-  2. 对于每个角度 θ ∈ [-π, π]（720 步）:
+	  1. 对于每个角度 θ ∈ [-π, π]（720 步）:
      a. 计算弦长 chord = 2R · sin(|θ| / 2)
      b. 计算扩散权重 weight = Burley(chord, d=1.0)
      c. 只有 cos(θ - α) > 0 的被照面才有贡献
      d. 累加: result += cos(θ - α) × weight
   3. 归一化: result / totalWeight
 ```
+![[Pasted image 20260811232051.png]]
+>**设计思想**：只烘焙物理基准距离 `d=1.0` 的单通道灰度 LUT。运行时在 Shader 中对 RGB 三通道分别采样：`curvature × ScatterRadius.rgb × ScatterScale`，实现免重复烘焙的万能体积散射。**缺点：原本对于ScatterRadius.rgb × ScatterScale并不应是线性关系**
 
->**设计思想**：只烘焙物理基准距离 `d=1.0` 的单通道灰度 LUT。运行时在 Shader 中对 RGB 三通道分别采样：`curvature × ScatterRadius.rgb × ScatterScale`，实现免重复烘焙的万能体积散射。
-
-### 2.3 相关文件
-
-| 文件 | 作用 |
-|------|------|
-| `Editor/SSSLUTGenerator.cs` | Editor 窗口，生成 Universal SSS LUT |
 
 ---
 
@@ -142,7 +137,7 @@ for each sample (Hammersley 低差异序列, 1024 次):
   1. 用 GGX 重要性采样生成半向量 H
   2. 反射得到光照方向 L = 2(V·H)H - V
   3. 计算几何遮蔽 G = G_SchlickGGX(N·V) × G_SchlickGGX(N·L)
-  4. 计算权重 G_Vis = G × (V·H) / ((N·H) × (N·V))
+  4. 计算权重 G_Vis = G × (V·H) / ((N·H) × (N·V))(除以概率密度得出)
   5. Fresnel: Fc = (1 - V·H)^5
   6. 累加:
      scale += (1 - Fc) × G_Vis    // F0 的系数
@@ -156,12 +151,6 @@ for each sample (Hammersley 低差异序列, 1024 次):
 float3 indirectSpecular = Envmap.Sample(rv, roughness_mip)
                         * (F0 * BRDF_LUT.r + BRDF_LUT.g);
 ```
-
-### 3.3 相关文件
-
-| 文件 | 作用 |
-|------|------|
-| `Editor/BRDFLUTGenerator.cs` | Editor 窗口，生成 BRDF LUT |
 
 ---
 
@@ -194,11 +183,9 @@ Kawase 模糊是一种高效的近似高斯模糊，通过对角线采样实现�
 
 ```
 降采样链（Pass 0）:
-  Original (1920×1080) → 960×540 → 480×270 → 240×135
   每级: 采样 4 个对角像素求平均，分辨率减半
 
 升采样链（Pass 1）:
-  240×135 → 480×270 → 960×540 → 1920×1080
   每级: 采样 4 个对角像素求平均，分辨率翻倍
 
 最终输出:
@@ -418,47 +405,3 @@ float3 indirectColor = lerp(indirectDiffuse, indirectSpecTrans, _Transmission)
 
 ---
 
-## 六、文件清单总览
-
-| 类别 | 文件路径 | 功能 |
-|------|----------|------|
-| **Shader** | `SHTranslucency/Resources/Shaders/BSDF.shader` | 主材质 Shader |
-| **Shader** | `SHTranslucency/Resources/Shaders/Thickness.shader` | 深度烘焙 Shader |
-| **Shader** | `SHTranslucency/Resources/Shaders/KawaseBlur.shader` | Kawase 模糊 Shader |
-| **Shader** | `SHTranslucency/Resources/Shaders/MonteCarloProject.shader` | MC SH 投影 Shader |
-| **Shader** | `SHTranslucency/Resources/Shaders/SH_Utils.hlsl` | SH 基函数与工具函数 |
-| **Compute** | `SHTranslucency/Resources/Shaders/Reduce_Uniform.compute` | Uniform 归约计算 |
-| **Compute** | `SHTranslucency/Resources/Shaders/Reduce_MC_1024.compute` | MC 归约计算 |
-| **Script** | `SHTranslucency/Scripts/SphericalHarmonics.cs` | C# SH 工具类 |
-| **Script** | `SHTranslucency/Scripts/TransmittanceObjectDrawFeature.cs` | URP 渲染 Feature |
-| **Editor** | `SHTranslucency/Editor/ThicknessCompute.cs` | 厚度烘焙工具 |
-| **Editor** | `SHTranslucency/Editor/SSSLUTGenerator.cs` | SSS LUT 生成工具 |
-| **Editor** | `SHTranslucency/Editor/BRDFLUTGenerator.cs` | BRDF LUT 生成工具 |
-
----
-
-## 七、使用流程
-
-```
-1. 烘焙阶段（Editor 工具）:
-   ├── Window → ThicknessCompute → 选择 Mesh → Compute Thickness
-   │   └── 输出: Assets/TranslucentMeshes/{name}.asset
-   ├── Window → Generate Universal SSS LUT
-   │   └── 输出: Assets/SHTranslucency/Resources/Universal_SSS_LUT.exr
-   └── Window → Generate BRDF LUT
-       └── 输出: Assets/SHTranslucency/Resources/BRDF_LUT.exr
-
-2. 材质设置:
-   ├── 将烘焙后的 Mesh asset 赋给模型
-   ├── 创建 Translucency/BSDF 材质
-   ├── 设置 BaseMap, Normal, MetallicGloss 等标准 PBR 贴图
-   ├── 设置 _UniversalSSSLUT = Universal_SSS_LUT
-   ├── 设置 _BRDF = BRDF_LUT
-   ├── 设置 _Envmap = 反射探针 Cubemap
-   └── 调节 SSS 与 Transmission 参数
-
-3. 渲染管线:
-   ├── 确保 URP Renderer 上挂载 TransmittanceObjectDrawFeature
-   ├── 设置 blurIterations & blurOffset
-   └── 运行 → BSDF 材质在 Transmittance Pass 中渲染
-```
