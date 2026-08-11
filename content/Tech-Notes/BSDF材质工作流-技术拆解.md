@@ -14,8 +14,6 @@ description: 基于球谐函数的 BSDF 材质工作流技术拆解，涵盖 SH 
 
 ## 概述
 
-
-
 ```mermaid
 	graph TD
     subgraph BSDF工作流全景图
