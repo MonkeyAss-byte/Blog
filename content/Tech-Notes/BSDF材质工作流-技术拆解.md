@@ -10,42 +10,37 @@ tags:
 description: 基于球谐函数的 BSDF 材质工作流技术拆解，涵盖 SH 深度烘焙、SSS/BRDF LUT 预计算、Kawase 模糊背景及实时 BSDF Shader 渲染管线
 ---
 
-# BSDF 材质工作流技术文档
+# BSDF 材质工作流
 
 ## 概述
 
-本项目实现了一套基于 **Spherical Harmonics（球谐函数）** 的次表面散射（SSS）与透射（Transmittance）渲染管线。核心思路是：通过预烘焙将模型的厚度信息编码为 3 阶球谐系数（9 个系数）存入顶点 UV 通道，运行时在 Shader 中实时重建任意方向上的厚度，并结合预计算的 SSS LUT、BRDF LUT 以及 Kawase 模糊后的背景图，实现物理可信的半透明材质渲染。
 
-```
-┌──────────────────────────────────────────────────────────────────────────┐
-│                            BSDF 工作流全景图                               │
-├──────────────────────────────────────────────────────────────────────────┤
-│                                                                          │
-│  ① 球谐深度烘焙           ② SSS LUT 烘焙          ③ BRDF LUT 烘焙        │
-│  ┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐       │
-│  │ Cubemap → SH 系数 │    │ Burley 扩散曲线   │    │ NdotV × Roughness│      │
-│  │ → Vertex UV2/3/4 │    │ + 球面圆截面积分   │    │ GGX 重要性采样    │       │
-│  └─────────────────┘    └─────────────────┘    └─────────────────┘       │
-│           │                      │                      │                │
-│           └──────────────────────┼──────────────────────┘                │
-│                                  ▼                                       │
-│                    ④ 渲染资源准备与队列设置                                 │
-│                    ┌─────────────────────────┐                           │
-│                    │ Opaque 后抓取背景图        │                           │
-│                    │ Dual Kawase 降采样+上采样  │                           │
-│                    │ 队列: AfterSkybox → BeforeTransparent │              │
-│                    └─────────────────────────┘                           │
-│                                  │                                       │
-│                                  ▼                                       │
-│                    ⑤ BSDF Shader 实时渲染                                 │
-│                    ┌─────────────────────────┐                           │
-│                    │ 直接光: Diffuse → SSS → Trans │                     │
-│                    │ 环境光: IBL + 透射背景图       │                     │
-│                    └─────────────────────────┘                           │
-└──────────────────────────────────────────────────────────────────────────┘
-```
 
----
+```mermaid
+	graph TD
+    subgraph BSDF工作流全景图
+        direction TD
+        
+        A["① 球谐深度烘焙<br/><br/>Cubemap → SH 系数<br/>→ Vertex UV2/3/4"]
+        B["② SSS LUT 烘焙<br/><br/>Burley 扩散曲线<br/>+ 球面圆截面积分"]
+        C["③ BRDF LUT 烘焙<br/><br/>NdotV × Roughness<br/>GGX 重要性采样"]
+        
+        D["④ 渲染资源准备与队列设置<br/><br/>Opaque 后抓取背景图<br/>Dual Kawase 降采样+上采样<br/>队列: AfterSkybox → BeforeTransparent"]
+        
+        E["⑤ BSDF Shader 实时渲染<br/><br/>直接光: Diffuse → SSS → Trans<br/>环境光: IBL + 透射背景图"]
+        
+        A --> D
+        B --> D
+        C --> D
+        D --> E
+    end
+    
+    classDef precompute fill:#2d3748,stroke:#4a5568,stroke-width:2px,color:#fff;
+    classDef render fill:#2b6cb0,stroke:#3182ce,stroke-width:2px,color:#fff;
+    
+    class A,B,C precompute;
+    class D,E render;
+```
 
 ## 一、球谐深度烘焙（Cubemap → SH → 顶点信息）
 
@@ -53,83 +48,39 @@ description: 基于球谐函数的 BSDF 材质工作流技术拆解，涵盖 SH 
 
 对于每个顶点，从该顶点位置向所有方向发射射线，记录射线在模型内部穿行的距离（即厚度）。这本质上是一个 **6 面 Cubemap 深度图** 的采集过程。为了将 Cubemap 压缩为可存储在顶点中的数据，使用 **3 阶球谐函数（9 个系数）** 进行投影。
 
-球谐基函数定义：
-
-| 系数 | 表达式 | 含义 |
-|------|--------|------|
-| $Y_0$ | $0.2820947917$ | 常数项（平均厚度） |
-| $Y_1$ | $0.4886025119 \cdot y$ | Y 方向线性 |
-| $Y_2$ | $0.4886025119 \cdot z$ | Z 方向线性 |
-| $Y_3$ | $0.4886025119 \cdot x$ | X 方向线性 |
-| $Y_4$ | $1.0925484306 \cdot xy$ | XY 双线性 |
-| $Y_5$ | $1.0925484306 \cdot yz$ | YZ 双线性 |
-| $Y_6$ | $0.3153915652 \cdot (3z^2 - 1)$ | Z 二次项 |
-| $Y_7$ | $1.0925484306 \cdot xz$ | XZ 双线性 |
-| $Y_8$ | $0.5462742153 \cdot (x^2 - y^2)$ | XY 二次差 |
-
 SH 投影公式：
 $$c_l = \int_{\Omega} f(\omega) \cdot Y_l(\omega) \, d\omega$$
 
-### 1.2 烘焙流程（ThicknessCompute.cs）
+### 1.2 烘焙流程
 
 ```
 For each vertex:
   1. 将顶点置于统一 10m 烘焙沙盒中（scaleFactor = 10 / maxDim）
-  2. 相机放到顶点位置 + 沿法线向内偏移 0.05m
+  2. 相机放到顶点位置 + 沿法线向内偏移
   3. 使用 Cull Front 的 Thickness Shader 渲染到 128×128 Cubemap
      - 剔除正面 → 相机在模型内部看到对面的内壁
-     - 输出: distance / 20.0（压缩到 0~1）
-  4. 调用 GPU_Project_Uniform_9Coeff() 将 Cubemap 投影为 9 个 SH 系数
-  5. 解码: 系数 × (20.0 / scaleFactor) → 恢复模型空间真实厚度
+     - 输出: distance 
+  4. 求解球谐投影系数
+  5. 解码: 系数 × (scaleFactor) → 恢复模型空间真实厚度
   6. 存储到 UV2, UV3, UV4 通道
 ```
 
-### 1.3 顶点数据布局
 
-| UV 通道 | 分量 | 内容 |
-|---------|------|------|
-| **UV2** | `.xyzw` | SH 系数 0~3（$Y_0$, $Y_1$, $Y_2$, $Y_3$） |
-| **UV3** | `.xyzw` | SH 系数 4~7（$Y_4$, $Y_5$, $Y_6$, $Y_7$） |
-| **UV4** | `.x` | SH 系数 8（$Y_8$） |
-| **UV4** | `.y` | 顶点曲率（curvature，用于 SSS LUT） |
+### 1.3 GPU 投影Kernel
 
->**关键设计**：使用 `float4` 类型（TEXCOORD1/2/3）接收数据，而非 Unity 传统的 `COLOR` 通道（8-bit），保证了 32-bit 全精度，避免 SH 系数量化误差。
-
-### 1.4 GPU 投影核心
-
-#### Reduce_Uniform.compute
-
-用于 Uniform 采样的 Cubemap → SH 投影：
 
 ```
 For each coefficient (0~8):
   1. 6 个 cubemap face × 分辨率 → 3D Texture2DArray
   2. 每个像素: color × SH_Basis(dir) × DifferentialSolidAngle
-  3. 多级 Reduce（8×8→4×4→2×2→1×1 树形归约）
+  3. 线程组中使用groupshared（共享内存）+ GroupMemoryBarrierWithGroupSync()进行线程组内的归并求和（对折算法）->pingpongBuffer，每次根据线程组求和的尺寸进行缩减.
   4. 输出单精度 float4 到 coefficients buffer
 ```
+![[Pasted image 20260811181606.png|693]]
 
-#### Reduce_MC_1024.compute
 
-用于 Monte Carlo 采样的快速投影（1024 样本）：
+![[Pasted image 20260811182029.png]]
 
-```
-1. 9 个 Pass 分别渲染 32×32 tile（3×3 布局 = 96×96 RT）
-2. 每个 Pass 采样随机方向，乘对应 SH 基函数
-3. 1024 线程并行归约（512→256→128→...→1）
-4. 最终 × 4π × (1/1024) 归一化
-```
-
-### 1.5 相关文件
-
-| 文件 | 作用 |
-|------|------|
-| `Editor/ThicknessCompute.cs` | Editor 窗口，驱动整个烘焙流程 |
-| `Resources/Shaders/Thickness.shader` | Cull Front 的深度渲染 Shader |
-| `Resources/Shaders/Reduce_Uniform.compute` | Uniform 采样的 GPU SH 投影 |
-| `Resources/Shaders/Reduce_MC_1024.compute` | Monte Carlo 采样的 GPU SH 投影 |
-| `Resources/Shaders/SH_Utils.hlsl` | SH 基函数 + 微分立体角 + Cubemap 方向映射 |
-| `Scripts/SphericalHarmonics.cs` | C# 侧的 SH 工具类（CPU 投影、格式转换） |
 
 ---
 
