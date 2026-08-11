@@ -31,13 +31,13 @@ description: 对于双向分布函数的IBL的工程实现
 	\end{pmatrix}
   $$
 	同理，对于三阶的基函数，同样是通过提取多项式中的原基函数的系数建立矩阵（5x5)
-#### 球面卷积
+### 球面卷积
 - 卷积个人理解：对原函数进行相对位置的积分处理得到一个新函数
-- $Irradiance_{IBL_diffuse}$公式：
+- $Irradiance_{IBL_{diffuse}}$**公式**：
   $$
   	E(n)=\int L_{i}(w)\cdot max(0,n\cdot \omega )d\omega 
   $$
-- 对于球谐基函数或傅里叶基函数此类频域的基函数来说，卷积操作等于基函数系数相乘(**基于基底正交性推导**），即：
+- 对于球谐基函数或傅里叶基函数此类频域的基函数来说，卷积操作等于基函数系数相乘(**基于其基底正交性推导**），即：
   $$
   	E(n)=\begin{pmatrix}
 		f_{0,0}\\f_{-1,0\\}\\f_{-1,0}\\\dots
@@ -45,4 +45,49 @@ description: 对于双向分布函数的IBL的工程实现
 		f(n)_{0,0}&f(n)_{-1,0\\}&f(n)_{-1,0}&\dots
 	\end{pmatrix}
   $$
-
+  推导过程：
+  $$
+		L_{i}(w)=\sum_{i=0}^{K-1}c_{i}Y_{i}(w)
+	$$
+	$$
+		max(0,n\cdot \omega)=\sum_{i=0}^{K-1}c_{ni}Y_{i}(w)
+	$$
+	$$
+  	E(n)=\int L_{i}(w)\cdot max(0,n\cdot \omega )d\omega=\int \sum_{i=0}^{K-1}c_{i}Y_{i}(w)\sum_{i=0}^{K-1}c_{ni}Y_{i}(w)d\omega=\sum_{i=0}^{K-1}c_{i}\cdot\sum_{i=0}^{K-1}c_{ni}
+  $$
+  其中Cni(**基于勒让德多项式**）：
+  $$
+	c^0_{i}=\pi \cdot Y^0_{i}(n)  , c^1_{i}=\frac{2}{3}\pi \cdot Y^1_{i}(n)  , c^2_{i}=\frac{1}{4}\pi \cdot Y^2_{i}(n)  
+  $$
+### 真实立体角（Cubemap->球面空间）
+- 公式：
+  $$
+  	dw=\frac{du\cdot dv\cdot \cos \alpha}{u^2+v^2+1},\cos \alpha=\frac{1}{\sqrt{ u^2+v^2+1 }}
+  $$
+## 镜面反射
+### 蒙特卡洛重要性采样
+- $Irradiance_{IBL_{specular}}$**公式**：
+   $$
+  	L_{o}=\int L_{i}(w)\cdot \frac{DFG}{4(N\cdot V)}d\omega =\frac{1}{N}\sum^N_{k=1}\frac{L_{i}(w)*\frac {DFG}{4(N\cdot V)}}{\rho(w)}
+  $$
+	其中
+	$$
+		\rho(w_{l})=\frac{D(H)\cdot(N\cdot H)}{4(H\cdot V)}
+	$$
+	推导：
+	$$
+		\rho(w_{l})*dw_{l}=\rho(h)*dw_{h}\implies p(w_{l})=\frac{\rho(h)*dw_{h}}{dw_{l}}=\frac{\rho(h)}{4(H\cdot V)}(反射立体角的变换)
+	$$
+	- 法线分布函数D（H）并非法线的概率密度函数，理由：D(H)为微观面积与宏观面积的立体角之比
+	- 对于除以概率密度的理解：
+		- 概率密度控制采样密度，积分本质为面积的计算，采样密度控制采样范围，累加（采样范围*采样值）=面积
+- 分离为：
+- **预滤波环境贴图**:
+  $$
+  	Sum_{1}=\frac{1}{N}\sum^N_{k=1}L_{i}(w)=\int L_{i}(w)*\rho(w)dw
+  $$
+- **BRDF项**：
+  $$
+  	Sum_{2}=\frac{1}{N}\sum^N_{k=1}(F_{0}\cdot(1-( 1-V\cdot H)^5)\cdot \frac{G\cdot(H\cdot V)}{(N\cdot V)(N\cdot H)} +(1-V\cdot H)^5\cdot \frac{G\cdot(H\cdot V)}{(N\cdot V)(N\cdot H)})
+  $$
+	其中第一项为R（Scale),第二项为G（Offset).
