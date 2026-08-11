@@ -19,7 +19,7 @@ description: 对于双向分布函数的IBL的工程实现
   $$
   	R=\begin{pmatrix}
 		R_{x x}&R_{xy}&R_{xz}\\R_{y x}&R_{yy}&R_{yz}\\R_{z x}&R_{zy}&R_{zz}
-	\end{pmatrix}
+	\end{pmatrix}(作用于坐标轴)
   $$
 	旋转变换时，我们应通过改变系数的方式去实现相应旋转，方便通过N采样时，我们能即时的将其（x,y,z）带入基函数，其中二阶基函数为$B_{0}=C_{0}\cdot y$,$B_{1}=C_{1}\cdot z$,$B_{0}=C_{2}\cdot x$,即：
   $$
