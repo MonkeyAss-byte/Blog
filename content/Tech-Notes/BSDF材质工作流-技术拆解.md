@@ -334,14 +334,14 @@ directTransmission = singleScatter * _Transmission * kD_direct;
 
 **参数说明**：
 
-| 参数 | 作用 |
-|------|------|
-| `_Transmission` | 全局透射强度（0~1），同时剥离漫反射能量 |
-| `_IOR` | 折射率（1~2.5），影响折射偏移 |
-| `_ThicknessDistort` | 折射偏移强度（0~1） |
-| `_TransmittanceColor` | 体积透射颜色（Beer-Lambert 衰减基准色） |
-| `_TransmittanceDistance` | 透射衰减距离 |
-| `_Anisotropy` | 相位函数各向异性（-1 后向 ~ +1 前向） |
+| 参数                       | 作用                         |
+| ------------------------ | -------------------------- |
+| `_Transluency`           | 全局透射强度（0~1），同时剥离漫反射能量      |
+| `_IOR`                   | 折射率（1~2.5），影响折射偏移          |
+| `_ThicknessDistort`      | 折射偏移强度（0~1）                |
+| `_TransmittanceColor`    | 体积透射颜色（Beer-Lambert 衰减基准色） |
+| `_TransmittanceDistance` | 透射衰减距离                     |
+| `_Anisotropy`            | 相位函数各向异性（-1 后向 ~ +1 前向）    |
 
 ### 5.4 环境光分解
 
@@ -363,7 +363,7 @@ float3 indirectSpecular = Envmap.SampleLevel(rv, roughness * 7).rgb
 
 #### 5.4.3 间接透射（背景图可视度）
 
-通过 `_Transmission` 在间接漫反射和背景透射之间过渡：
+通过 `_Transluency ` 在间接漫反射和背景透射之间过渡：
 
 ```hlsl
 // 背景图模糊度由厚度控制
@@ -398,7 +398,7 @@ float3 indirectColor = lerp(indirectDiffuse, indirectSpecTrans, _Transmission)
   直接光漫反射 = lerp(Lambert × kD, SSS_Diffuse × (1-metallic), _SSSIntensity)
                × (1 - _Transmission)   ← 透射从漫反射中剥走能量
 
-  间接光 = lerp(SH Diffuse, Transmission_Background, _Transmission) + IBL Specular
+  间接光 = lerp(SH Diffuse, Background, _Transluency) + IBL Specular
 ```
 
 ---
