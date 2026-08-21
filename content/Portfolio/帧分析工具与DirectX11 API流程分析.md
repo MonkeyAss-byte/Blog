@@ -1,6 +1,7 @@
 >帧分析工具基于renderdoc与XXMI开发，在此基础上梳理引擎与图形API的链接
 >https://github.com/SpectrumQT/XXMI-Launcher.git
 >https://github.com/baldurk/renderdoc.git
+>https://github.com/MonkeyAss-byte/RdcCapture.git
 
 ---
 # 渲染管线对应的调用图形API的流程图（一般情况）
