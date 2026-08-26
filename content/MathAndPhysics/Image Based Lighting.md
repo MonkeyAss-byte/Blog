@@ -8,7 +8,7 @@ description: 对于双向分布函数的IBL的工程实现
 ---
 # IBL
 
-> Image Based Lighting多在工程中应用于环境光,分别针对于漫反射与镜面反射
+> Image Based Lighting多在工程中应用于环境光,分别针对于BRDF中的漫反射与镜面反射
 ---
 ## 漫反射
 ### 球谐函数
@@ -80,7 +80,11 @@ description: 对于双向分布函数的IBL的工程实现
 	$$
 	- 法线分布函数D（H）并非法线的概率密度函数，理由：D(H)为微观面积与宏观面积的立体角之比
 	- 对于除以概率密度的理解：
-		- 概率密度控制采样密度，积分本质为面积的计算，采样密度控制采样范围，累加（采样范围*采样值）=面积
+		- 概率密度控制采样密度，积分本质为面积的计算，采样密度与采样范围成反比，累加（采样范围x采样值）=面积
+		- g(x)乘以概率密度再积分意义为该积分域的g(x)的平均值，所以累加即可得到
+		  $$
+		  	\int f(x)dx=\int \frac{f(x)}{p(x)}*p(x)dx=\int g(x)*p(x)dx=E[g(x)]
+		  $$
 - 分离为：
 - **预滤波环境贴图**:
   $$
@@ -90,4 +94,8 @@ description: 对于双向分布函数的IBL的工程实现
   $$
   	Sum_{2}=\frac{1}{N}\sum^N_{k=1}(F_{0}\cdot(1-( 1-V\cdot H)^5)\cdot \frac{G\cdot(H\cdot V)}{(N\cdot V)(N\cdot H)} +(1-V\cdot H)^5\cdot \frac{G\cdot(H\cdot V)}{(N\cdot V)(N\cdot H)})
   $$
+  $$
+	=F_{0}\cdot \frac{1}{N}(1-( 1-V\cdot H)^5)\cdot \frac{G\cdot(H\cdot V)}{(N\cdot V)(N\cdot H)}+\frac{1}{N}(1-V\cdot H)^5\cdot \frac{G\cdot(H\cdot V)}{(N\cdot V)(N\cdot H)}
+  $$
 	其中第一项为R（Scale),第二项为G（Offset).
+	所有基于BRDF cooktorrance的双向反射分布函数都可以进行类似公式
