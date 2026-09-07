@@ -430,21 +430,48 @@ function setupCustomCursor() {
   };
 }
 
-// --- 9. Frosted-Glass Video Player (Click-to-Load On Demand) ---
+// --- 9. Frosted-Glass Video Player & SPA Media Lifecycle ---
+function stopAllMedia() {
+  document.querySelectorAll("video, audio").forEach((media) => {
+    try {
+      const m = media as HTMLMediaElement;
+      m.pause();
+      m.removeAttribute("src");
+      m.load();
+    } catch (e) {}
+  });
+
+  document.querySelectorAll(".glass-video-card").forEach((card) => {
+    const cover = card.querySelector(".glass-video-cover");
+    if (cover) cover.classList.remove("playing");
+    const video = card.querySelector("video");
+    if (video) video.controls = false;
+  });
+}
+
 function setupGlassVideoPlayers() {
+  // Ensure any media from previous page / micromorph is stopped
+  stopAllMedia();
+
   const cards = document.querySelectorAll(".glass-video-card") as NodeListOf<HTMLElement>;
   for (const card of cards) {
-    if (card.dataset.glassVideoInit) continue;
-    card.dataset.glassVideoInit = "true";
-
     const cover = card.querySelector(".glass-video-cover") as HTMLElement | null;
     const video = card.querySelector("video") as HTMLVideoElement | null;
     if (!cover || !video) continue;
 
-    cover.addEventListener("click", () => {
-      const src = video.dataset.src || video.getAttribute("data-src");
-      if (src && (!video.src || video.src === window.location.href || !video.src.startsWith("http"))) {
-        video.src = src;
+    // Reset cover to frosted glass state
+    cover.classList.remove("playing");
+    video.controls = false;
+
+    // Detach any previous handler if element was morphed
+    if ((card as any)._glassClickHandler) {
+      cover.removeEventListener("click", (card as any)._glassClickHandler);
+    }
+
+    const clickHandler = () => {
+      const targetSrc = video.getAttribute("data-src") || video.dataset.src;
+      if (targetSrc && (!video.src || !video.src.includes(targetSrc))) {
+        video.src = targetSrc;
       }
       video.controls = true;
       video.load();
@@ -455,8 +482,18 @@ function setupGlassVideoPlayers() {
         });
       }
       cover.classList.add("playing");
-    });
+    };
+
+    (card as any)._glassClickHandler = clickHandler;
+    cover.addEventListener("click", clickHandler);
   }
+}
+
+// Stop video immediately when navigating away
+document.addEventListener("prenav", stopAllMedia);
+window.addEventListener("pagehide", stopAllMedia);
+if (typeof (window as any).addCleanup === "function") {
+  (window as any).addCleanup(stopAllMedia);
 }
 
 document.addEventListener("nav", () => {
@@ -482,4 +519,5 @@ setupDarkmodeTransition();
 setupImageZoom();
 setupCustomCursor();
 setupGlassVideoPlayers();
+
 
