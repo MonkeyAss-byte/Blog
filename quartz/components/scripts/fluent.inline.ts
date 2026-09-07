@@ -343,16 +343,30 @@ function setupCustomCursor() {
     }
   };
 
+  const onMouseLeave = () => {
+    const activeCursor = document.getElementById("fluent-cursor");
+    if (activeCursor) activeCursor.style.opacity = "0";
+  };
+
+  const onMouseEnter = () => {
+    const activeCursor = document.getElementById("fluent-cursor");
+    if (activeCursor) activeCursor.style.opacity = "1";
+  };
+
   window.addEventListener("mousemove", onMouseMove);
   window.addEventListener("mousedown", onMouseDown);
   window.addEventListener("mouseup", onMouseUp);
   window.addEventListener("mouseover", onMouseOver);
+  document.documentElement.addEventListener("mouseleave", onMouseLeave);
+  document.documentElement.addEventListener("mouseenter", onMouseEnter);
 
   (window as any).fluentCursorCleanup = () => {
     window.removeEventListener("mousemove", onMouseMove);
     window.removeEventListener("mousedown", onMouseDown);
     window.removeEventListener("mouseup", onMouseUp);
     window.removeEventListener("mouseover", onMouseOver);
+    document.documentElement.removeEventListener("mouseleave", onMouseLeave);
+    document.documentElement.removeEventListener("mouseenter", onMouseEnter);
     cancelAnimationFrame(rafId);
   };
 
@@ -429,11 +443,17 @@ function setupGlassVideoPlayers() {
 
     cover.addEventListener("click", () => {
       const src = video.dataset.src || video.getAttribute("data-src");
-      if (src && !video.src) {
+      if (src && (!video.src || video.src === window.location.href || !video.src.startsWith("http"))) {
         video.src = src;
       }
+      video.controls = true;
       video.load();
-      video.play().catch(() => {});
+      const playPromise = video.play();
+      if (playPromise !== undefined) {
+        playPromise.catch((err) => {
+          console.warn("Video play failed:", err);
+        });
+      }
       cover.classList.add("playing");
     });
   }
