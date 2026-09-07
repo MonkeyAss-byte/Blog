@@ -297,8 +297,12 @@ body:has(.center:hover) .edge-blur-layer {
   }
 }
 
-// --- Image Zoom (Long Press) ---
+// --- Image Zoom (Long Press) & Gallery ---
 article img {
+  display: block;
+  margin: 1.8rem auto !important;
+  border-radius: 8px;
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.08);
   transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.4s ease;
   transform-origin: center;
   cursor: zoom-in;
@@ -306,9 +310,77 @@ article img {
 
 article img:not(.zoomed-in):hover {
   transform: scale(1.02);
-  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.18);
   z-index: 10;
   position: relative;
+}
+
+// --- Article Typography & Breathing Room Spacing ---
+article {
+  p, li {
+    line-height: 1.8 !important;
+    font-size: 1.02rem;
+  }
+
+  p {
+    margin-bottom: 1.25rem !important;
+  }
+
+  ul, ol {
+    margin-top: 0.6rem !important;
+    margin-bottom: 1.35rem !important;
+    padding-left: 1.5rem;
+  }
+
+  ul > li, ol > li {
+    margin-bottom: 0.8rem !important;
+    line-height: 1.8 !important;
+  }
+
+  li > ul, li > ol {
+    margin-top: 0.4rem !important;
+    margin-bottom: 0.4rem !important;
+  }
+
+  h1 {
+    margin-top: 2rem !important;
+    margin-bottom: 1.6rem !important;
+    letter-spacing: -0.3px;
+  }
+
+  h2 {
+    margin-top: 3.2rem !important;
+    margin-bottom: 1.3rem !important;
+    font-size: 1.55rem !important;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid color-mix(in srgb, var(--lightgray) 45%, transparent);
+    letter-spacing: -0.2px;
+  }
+
+  h3 {
+    margin-top: 2.2rem !important;
+    margin-bottom: 1rem !important;
+    font-size: 1.25rem !important;
+  }
+
+  h4 {
+    margin-top: 1.8rem !important;
+    margin-bottom: 0.75rem !important;
+    font-size: 1.08rem !important;
+  }
+
+  hr {
+    margin: 3.2rem 0 !important;
+    border: none !important;
+    height: 1px !important;
+    background: linear-gradient(90deg, transparent, var(--lightgray), transparent) !important;
+  }
+
+  blockquote {
+    margin: 1.8rem 0 !important;
+    padding: 1rem 1.4rem !important;
+    border-radius: 8px;
+  }
 }
 
 // Background Blur Overlay
@@ -371,30 +443,48 @@ body.image-zoomed {
   }
 }
 
-// --- Video & Bilibili Embeds (16:9 Responsive) ---
+// --- Video & Cinema Embeds (YouTube-Style Ambient Frosted Glass) ---
 article iframe[src*="bilibili.com"],
-article iframe[src*="player.bilibili.com"],
+article iframe[src*="player.bilibili.com"] {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  border-radius: 12px;
+  border: 1px solid var(--lightgray);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.14);
+  margin: 2.2rem 0;
+  background-color: #000;
+}
+
+// Default HTML5 video player - automatically styled as YouTube Ambient Cinema Card
 article video {
   display: block;
   width: 100%;
   aspect-ratio: 16 / 9;
   object-fit: contain;
-  border-radius: 8px;
-  border: 1px solid var(--lightgray);
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
-  margin: 1.5rem 0;
-  background-color: #000;
+  border-radius: 12px;
+  border: 1px solid color-mix(in srgb, var(--darkgray) 18%, transparent);
+  border-top: 1px solid rgba(255, 255, 255, 0.35);
+  box-shadow: 0 14px 40px -10px rgba(0, 0, 0, 0.3), 0 0 45px -10px rgba(139, 92, 246, 0.22);
+  margin: 2.2rem auto;
+  background-color: #090a10;
   outline: none;
+  transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.3s ease;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 20px 50px -10px rgba(0, 0, 0, 0.38), 0 0 55px -5px rgba(139, 92, 246, 0.32);
+  }
 }
 
 .video-container {
   position: relative;
   width: 100%;
   aspect-ratio: 16 / 9;
-  margin: 1.5rem 0;
-  border-radius: 8px;
+  margin: 2.2rem 0;
+  border-radius: 12px;
   overflow: hidden;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+  box-shadow: 0 14px 40px -10px rgba(0, 0, 0, 0.3), 0 0 45px -10px rgba(139, 92, 246, 0.22);
   border: 1px solid var(--lightgray);
 
   iframe {
@@ -405,6 +495,97 @@ article video {
     height: 100%;
     margin: 0;
     border: none;
+  }
+}
+
+// --- YouTube-Style Frosted Glass Player Card (.yt-video-card) ---
+.yt-video-card {
+  position: relative;
+  margin: 2.4rem 0;
+  border-radius: 14px;
+  background: color-mix(in srgb, var(--light) 60%, transparent);
+  backdrop-filter: blur(28px) saturate(180%);
+  -webkit-backdrop-filter: blur(28px) saturate(180%);
+  border: 1px solid color-mix(in srgb, var(--darkgray) 14%, transparent);
+  border-top: 1px solid rgba(255, 255, 255, 0.35);
+  box-shadow: 0 16px 45px -10px rgba(0, 0, 0, 0.22), 0 0 40px -10px rgba(139, 92, 246, 0.18);
+  overflow: hidden;
+  transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.3s ease;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 22px 55px -10px rgba(0, 0, 0, 0.3), 0 0 55px -5px rgba(139, 92, 246, 0.28);
+  }
+
+  .yt-screen {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    background: #08090e;
+    overflow: hidden;
+
+    video {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      display: block;
+      margin: 0 !important;
+      border: none !important;
+      border-radius: 0 !important;
+      box-shadow: none !important;
+      transform: none !important;
+    }
+  }
+
+  .yt-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.85rem 1.25rem;
+    background: color-mix(in srgb, var(--light) 85%, transparent);
+    border-top: 1px solid color-mix(in srgb, var(--lightgray) 50%, transparent);
+
+    .yt-info {
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+      min-width: 0;
+    }
+
+    .yt-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      padding: 0.22rem 0.6rem;
+      border-radius: 4px;
+      background: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%);
+      color: #ffffff;
+      box-shadow: 0 2px 8px rgba(239, 68, 68, 0.35);
+      white-space: nowrap;
+    }
+
+    .yt-title {
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--dark);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      margin: 0;
+    }
+
+    .yt-tag {
+      font-size: 0.76rem;
+      color: var(--gray);
+      background: var(--highlight);
+      padding: 0.22rem 0.65rem;
+      border-radius: 4px;
+      font-weight: 500;
+      white-space: nowrap;
+    }
   }
 }
 
@@ -537,4 +718,160 @@ article video {
   }
 }
 
+// --- Technical Notes & Portfolio Layout Utilities ---
 
+// 1. Responsive Image Grids
+.image-grid-2 {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.25rem;
+  align-items: stretch;
+  margin: 1.5rem 0;
+
+  p {
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+  }
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 8px;
+    display: block;
+    margin: 0;
+    border: 1px solid var(--lightgray);
+  }
+
+  @media all and ($mobile) {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+}
+
+.image-grid-3 {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  align-items: stretch;
+  margin: 1.5rem 0;
+
+  p {
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+  }
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 8px;
+    display: block;
+    margin: 0;
+    border: 1px solid var(--lightgray);
+  }
+
+  @media all and ($mobile) {
+    grid-template-columns: 1fr;
+  }
+}
+
+// 2. Comparison Card with Captions
+.comp-card {
+  display: flex;
+  flex-direction: column;
+  background: color-mix(in srgb, var(--light) 75%, transparent);
+  border: 1px solid var(--lightgray);
+  border-radius: 8px;
+  overflow: hidden;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+  margin-bottom: 0.5rem;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  }
+
+  img {
+    width: 100%;
+    display: block;
+    border-radius: 0 !important;
+    border: none !important;
+    margin: 0 !important;
+  }
+
+  .comp-label {
+    padding: 0.5rem 0.8rem;
+    font-size: 0.84rem;
+    font-weight: 600;
+    text-align: center;
+    color: var(--darkgray);
+    background: color-mix(in srgb, var(--light) 92%, transparent);
+    border-top: 1px solid color-mix(in srgb, var(--lightgray) 60%, transparent);
+    letter-spacing: 0.2px;
+
+    &.bad {
+      color: #ef4444;
+    }
+    &.good {
+      color: #10b981;
+    }
+  }
+}
+
+// 3. High-Contrast Technical Badges
+.tech-tag {
+  display: inline-block;
+  font-size: 0.76rem;
+  font-weight: 600;
+  padding: 0.15rem 0.55rem;
+  border-radius: 4px;
+  background: color-mix(in srgb, var(--secondary) 15%, transparent);
+  color: var(--secondary);
+  border: 1px solid color-mix(in srgb, var(--secondary) 25%, transparent);
+  margin-right: 0.35rem;
+  margin-bottom: 0.35rem;
+  vertical-align: middle;
+}
+
+// 4. Elegant Glassmorphic Tables for Technical Specs
+article table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  margin: 1.5rem 0;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid var(--lightgray);
+  background: color-mix(in srgb, var(--light) 60%, transparent);
+  backdrop-filter: blur(8px);
+
+  th {
+    background: color-mix(in srgb, var(--secondary) 12%, var(--light));
+    color: var(--dark);
+    font-weight: 600;
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid var(--lightgray);
+    text-align: left;
+    font-size: 0.9rem;
+  }
+
+  td {
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid color-mix(in srgb, var(--lightgray) 40%, transparent);
+    font-size: 0.9rem;
+    line-height: 1.5;
+  }
+
+  tr:last-child td {
+    border-bottom: none;
+  }
+
+  tbody tr:hover {
+    background: color-mix(in srgb, var(--highlight) 30%, transparent);
+  }
+}
