@@ -332,7 +332,7 @@ function setupCustomCursor() {
   
   const onMouseOver = (e: MouseEvent) => {
     const target = e.target as HTMLElement;
-    const isInteractable = target.closest("a, button, input, textarea, .card, article img");
+    const isInteractable = target.closest("a, button, input, textarea, .card, article img, .glass-video-card, .glass-play-btn, .glass-video-cover, video");
     const activeCursor = document.getElementById("fluent-cursor");
     if (activeCursor) {
       if (isInteractable) {
@@ -416,12 +416,36 @@ function setupCustomCursor() {
   };
 }
 
+// --- 9. Frosted-Glass Video Player (Click-to-Load On Demand) ---
+function setupGlassVideoPlayers() {
+  const cards = document.querySelectorAll(".glass-video-card") as NodeListOf<HTMLElement>;
+  for (const card of cards) {
+    if (card.dataset.glassVideoInit) continue;
+    card.dataset.glassVideoInit = "true";
+
+    const cover = card.querySelector(".glass-video-cover") as HTMLElement | null;
+    const video = card.querySelector("video") as HTMLVideoElement | null;
+    if (!cover || !video) continue;
+
+    cover.addEventListener("click", () => {
+      const src = video.dataset.src || video.getAttribute("data-src");
+      if (src && !video.src) {
+        video.src = src;
+      }
+      video.load();
+      video.play().catch(() => {});
+      cover.classList.add("playing");
+    });
+  }
+}
+
 document.addEventListener("nav", () => {
   setupFluentMotion();
   setupMobileInteraction();
   setupDarkmodeTransition();
   setupImageZoom();
   setupCustomCursor();
+  setupGlassVideoPlayers();
 });
 window.addEventListener("DOMContentLoaded", () => {
   setupFluentMotion();
@@ -429,6 +453,7 @@ window.addEventListener("DOMContentLoaded", () => {
   setupDarkmodeTransition();
   setupImageZoom();
   setupCustomCursor();
+  setupGlassVideoPlayers();
 });
 // Run once immediately in case DOM is already loaded
 setupFluentMotion();
@@ -436,4 +461,5 @@ setupMobileInteraction();
 setupDarkmodeTransition();
 setupImageZoom();
 setupCustomCursor();
+setupGlassVideoPlayers();
 

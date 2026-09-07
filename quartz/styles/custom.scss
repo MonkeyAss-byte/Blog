@@ -498,96 +498,100 @@ article video {
   }
 }
 
-// --- YouTube-Style Frosted Glass Player Card (.yt-video-card) ---
-.yt-video-card {
+// --- Pure Frosted Glass Video Card (.glass-video-card) ---
+.glass-video-card {
   position: relative;
-  margin: 2.4rem 0;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  margin: 2.2rem auto;
   border-radius: 14px;
-  background: color-mix(in srgb, var(--light) 60%, transparent);
-  backdrop-filter: blur(28px) saturate(180%);
-  -webkit-backdrop-filter: blur(28px) saturate(180%);
-  border: 1px solid color-mix(in srgb, var(--darkgray) 14%, transparent);
-  border-top: 1px solid rgba(255, 255, 255, 0.35);
-  box-shadow: 0 16px 45px -10px rgba(0, 0, 0, 0.22), 0 0 40px -10px rgba(139, 92, 246, 0.18);
   overflow: hidden;
+  background-color: #0b0c12;
+  border: 1px solid color-mix(in srgb, var(--darkgray) 18%, transparent);
+  border-top: 1px solid rgba(255, 255, 255, 0.35);
+  box-shadow: 0 14px 40px -10px rgba(0, 0, 0, 0.35), 0 0 45px -10px rgba(139, 92, 246, 0.2);
   transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.3s ease;
+  user-select: none;
+
+  // Never revert to native cursor
+  &, & *, video, .glass-video-cover, .glass-play-btn {
+    cursor: none !important;
+  }
 
   &:hover {
     transform: translateY(-2px);
-    box-shadow: 0 22px 55px -10px rgba(0, 0, 0, 0.3), 0 0 55px -5px rgba(139, 92, 246, 0.28);
+    box-shadow: 0 20px 50px -10px rgba(0, 0, 0, 0.42), 0 0 55px -5px rgba(139, 92, 246, 0.32);
   }
 
-  .yt-screen {
-    position: relative;
+  video {
     width: 100%;
-    aspect-ratio: 16 / 9;
-    background: #08090e;
-    overflow: hidden;
-
-    video {
-      width: 100%;
-      height: 100%;
-      object-fit: contain;
-      display: block;
-      margin: 0 !important;
-      border: none !important;
-      border-radius: 0 !important;
-      box-shadow: none !important;
-      transform: none !important;
-    }
+    height: 100%;
+    object-fit: contain;
+    display: block;
+    margin: 0 !important;
+    border: none !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    background-color: #000;
   }
 
-  .yt-bar {
+  // Pure Frosted Glass Cover (Active before user clicks play)
+  .glass-video-cover {
+    position: absolute;
+    inset: 0;
+    z-index: 10;
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    padding: 0.85rem 1.25rem;
-    background: color-mix(in srgb, var(--light) 85%, transparent);
-    border-top: 1px solid color-mix(in srgb, var(--lightgray) 50%, transparent);
+    justify-content: center;
+    background: radial-gradient(circle at center, rgba(30, 32, 45, 0.45) 0%, rgba(10, 12, 18, 0.8) 100%);
+    backdrop-filter: blur(28px) saturate(170%);
+    -webkit-backdrop-filter: blur(28px) saturate(170%);
+    transition: opacity 0.45s ease, visibility 0.45s ease;
 
-    .yt-info {
+    &.playing {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+
+    .glass-play-btn {
+      width: 72px;
+      height: 72px;
+      border-radius: 50%;
+      background: color-mix(in srgb, var(--light) 65%, transparent);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.45);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35), 0 0 25px rgba(139, 92, 246, 0.25);
       display: flex;
       align-items: center;
-      gap: 0.65rem;
-      min-width: 0;
-    }
-
-    .yt-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.3rem;
-      font-size: 0.72rem;
-      font-weight: 700;
-      letter-spacing: 0.5px;
-      padding: 0.22rem 0.6rem;
-      border-radius: 4px;
-      background: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%);
-      color: #ffffff;
-      box-shadow: 0 2px 8px rgba(239, 68, 68, 0.35);
-      white-space: nowrap;
-    }
-
-    .yt-title {
-      font-size: 0.95rem;
-      font-weight: 600;
+      justify-content: center;
       color: var(--dark);
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      margin: 0;
+      transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1), background 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+
+      svg {
+        margin-left: 4px; // Optical centering for triangle
+        width: 28px;
+        height: 28px;
+        fill: currentColor;
+        transition: transform 0.3s ease;
+      }
     }
 
-    .yt-tag {
-      font-size: 0.76rem;
-      color: var(--gray);
-      background: var(--highlight);
-      padding: 0.22rem 0.65rem;
-      border-radius: 4px;
-      font-weight: 500;
-      white-space: nowrap;
+    &:hover .glass-play-btn {
+      transform: scale(1.12);
+      background: color-mix(in srgb, var(--light) 92%, transparent);
+      border-color: rgba(255, 255, 255, 0.85);
+      box-shadow: 0 14px 40px rgba(0, 0, 0, 0.45), 0 0 35px rgba(139, 92, 246, 0.5);
+      color: var(--secondary);
+
+      svg {
+        transform: scale(1.05);
+      }
     }
   }
 }
+
 
 // --- Fluent Video Card ---
 .fluent-video-card {
