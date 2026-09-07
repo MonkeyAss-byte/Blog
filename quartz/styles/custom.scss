@@ -438,19 +438,6 @@ body.image-zoomed {
     cursor: none !important;
   }
 
-  // Hide 3-dots overflow button and download menus completely
-  video::-webkit-media-controls-overflow-button,
-  video::-webkit-media-controls-overflow-menu-list,
-  video::-internal-media-controls-overflow-button,
-  video::-webkit-media-controls-download-button {
-    display: none !important;
-    opacity: 0 !important;
-    pointer-events: none !important;
-    visibility: hidden !important;
-    width: 0 !important;
-    height: 0 !important;
-  }
-
   #fluent-cursor {
     position: fixed;
     top: 0;
@@ -474,6 +461,21 @@ body.image-zoomed {
     /* Change fill to a nice theme purple (#8b5cf6) on hover */
     background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Cpath d='M1 1 l 7.5 20.5 l 3.5 -8.5 l 8.5 -3.5 Z' fill='%238b5cf6' stroke='%23FFFFFF' stroke-width='1.5' stroke-linejoin='round'/%3E%3C/svg%3E");
   }
+}
+
+// Hide 3-dots overflow button (Download, Playback Rate, PiP menu) completely across all browsers
+video::-webkit-media-controls-overflow-button,
+video::-webkit-media-controls-overflow-menu-list,
+video::-internal-media-controls-overflow-button,
+video::-webkit-media-controls-download-button {
+  display: none !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+  visibility: hidden !important;
+  width: 0 !important;
+  height: 0 !important;
+  max-width: 0 !important;
+  max-height: 0 !important;
 }
 
 // --- Video & Cinema Embeds (YouTube-Style Ambient Frosted Glass) ---
