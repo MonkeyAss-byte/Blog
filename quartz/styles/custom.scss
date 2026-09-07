@@ -373,15 +373,18 @@ body.image-zoomed {
 
 // --- Video & Bilibili Embeds (16:9 Responsive) ---
 article iframe[src*="bilibili.com"],
-article iframe[src*="player.bilibili.com"] {
+article iframe[src*="player.bilibili.com"],
+article video {
   display: block;
   width: 100%;
   aspect-ratio: 16 / 9;
+  object-fit: contain;
   border-radius: 8px;
   border: 1px solid var(--lightgray);
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
   margin: 1.5rem 0;
   background-color: #000;
+  outline: none;
 }
 
 .video-container {
