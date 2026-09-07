@@ -370,3 +370,38 @@ body.image-zoomed {
     background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Cpath d='M1 1 l 7.5 20.5 l 3.5 -8.5 l 8.5 -3.5 Z' fill='%238b5cf6' stroke='%23FFFFFF' stroke-width='1.5' stroke-linejoin='round'/%3E%3C/svg%3E");
   }
 }
+
+// --- Video & Bilibili Embeds (16:9 Responsive) ---
+article iframe[src*="bilibili.com"],
+article iframe[src*="player.bilibili.com"] {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  border-radius: 8px;
+  border: 1px solid var(--lightgray);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+  margin: 1.5rem 0;
+  background-color: #000;
+}
+
+.video-container {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  margin: 1.5rem 0;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+  border: 1px solid var(--lightgray);
+
+  iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    border: none;
+  }
+}
+
