@@ -434,9 +434,21 @@ body.image-zoomed {
   video::-webkit-media-controls-volume-slider,
   video::-webkit-media-controls-seek-back-button,
   video::-webkit-media-controls-seek-forward-button,
-  video::-webkit-media-controls-fullscreen-button,
-  video::-webkit-media-controls-overflow-button {
+  video::-webkit-media-controls-fullscreen-button {
     cursor: none !important;
+  }
+
+  // Hide 3-dots overflow button and download menus completely
+  video::-webkit-media-controls-overflow-button,
+  video::-webkit-media-controls-overflow-menu-list,
+  video::-internal-media-controls-overflow-button,
+  video::-webkit-media-controls-download-button {
+    display: none !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+    visibility: hidden !important;
+    width: 0 !important;
+    height: 0 !important;
   }
 
   #fluent-cursor {

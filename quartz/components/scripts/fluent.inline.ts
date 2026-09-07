@@ -461,7 +461,11 @@ function setupGlassVideoPlayers() {
 
     // Reset cover to frosted glass state
     cover.classList.remove("playing");
-    video.controls = false;
+    // Ensure controlsList is set to suppress overflow menu
+    video.setAttribute("controlsList", "nodownload noplaybackrate nopictureinpicture");
+    video.disablePictureInPicture = true;
+    (video as any).disableRemotePlayback = true;
+    video.addEventListener("contextmenu", (e) => e.preventDefault());
 
     // Detach any previous handler if element was morphed
     if ((card as any)._glassClickHandler) {
@@ -474,6 +478,9 @@ function setupGlassVideoPlayers() {
         video.src = targetSrc;
       }
       video.controls = true;
+      video.setAttribute("controlsList", "nodownload noplaybackrate nopictureinpicture");
+      video.disablePictureInPicture = true;
+      (video as any).disableRemotePlayback = true;
       video.load();
       const playPromise = video.play();
       if (playPromise !== undefined) {
