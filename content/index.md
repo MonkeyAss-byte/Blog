@@ -1,14 +1,6 @@
 ---
 title: MonkeyAss-byte
-date: 2026-07-12
-tags:
-  - 主页
 description: 一个专注于图形渲染、游戏开发与技术拆解的个人博客
----
-
-MonkeyAss-byte，图形渲染与游戏开发方向。
-专注于 Shader 编程、Unity URP 与实时渲染技术的拆解与实践。
-
 ---
 
 

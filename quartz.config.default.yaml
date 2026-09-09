@@ -159,6 +159,7 @@ plugins:
     layout:
       position: beforeBody
       priority: 20
+      condition: not-index
   - source: github:quartz-community/tag-list
     enabled: false
     layout:
@@ -231,6 +232,7 @@ plugins:
       position: beforeBody
       priority: 15
       display: all
+      condition: not-index
   - source: github:quartz-community/unlisted-pages
     enabled: true
     options: {}

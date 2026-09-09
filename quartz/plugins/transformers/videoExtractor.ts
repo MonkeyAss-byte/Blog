@@ -18,17 +18,11 @@ export const VideoExtractor: QuartzTransformerPlugin = () => {
           const hasPortfolioTag = tags.some(
             (t: any) =>
               typeof t === "string" &&
-              (t.toLowerCase() === "portfolio" || t === "作品集" || t === "精选"),
+              (t.toLowerCase() === "portfolio" || t === "作品集"),
           )
 
-          const slugLower = slug.toLowerCase()
-          const isInPortfolioDir =
-            slugLower.startsWith("portfolio/") &&
-            slugLower !== "portfolio/index" &&
-            slugLower !== "portfolio"
-
           const isPortfolio =
-            !isExplicitNonPortfolio && (isExplicitPortfolio || hasPortfolioTag || isInPortfolioDir)
+            !isExplicitNonPortfolio && (isExplicitPortfolio || hasPortfolioTag)
 
           if (isPortfolio) {
             fm.portfolio = true

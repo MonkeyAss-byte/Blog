@@ -9,7 +9,7 @@ tags:
   - Markdown
   - TypeScript
 description: Project Graph 扩展 "PRG to Markdown (with Pic)" 的完整技术拆解，涵盖多线程架构、数据解析、递归提取与排版引擎
-portfolio: true
+portfolio: false
 portfolio_order: 6
 portfolio_tag: 工具开发 / 扩展架构
 ---

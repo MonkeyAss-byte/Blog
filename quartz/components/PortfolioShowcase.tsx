@@ -86,17 +86,8 @@ export default (() => {
         tags.some(
           (t: any) =>
             typeof t === "string" &&
-            (t.toLowerCase() === "portfolio" || t === "作品集" || t === "精选"),
+            (t.toLowerCase() === "portfolio" || t === "作品集"),
         )
-      ) {
-        return true
-      }
-
-      const slugLower = (file.slug || "").toLowerCase()
-      if (
-        slugLower.startsWith("portfolio/") &&
-        slugLower !== "portfolio/index" &&
-        slugLower !== "portfolio"
       ) {
         return true
       }
