@@ -14,7 +14,7 @@ portfolio_order: 6
 portfolio_tag: 工具开发 / 扩展架构
 ---
 
-# Project Graph 扩展开发 - PRG to Markdown 技术拆解
+# Project Graph 扩展开发 
 
 > 将 `.prg` 工程文件导出为 Markdown（含内嵌图片），零外部依赖
 
