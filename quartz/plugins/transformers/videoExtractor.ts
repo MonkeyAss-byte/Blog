@@ -39,8 +39,8 @@ export const VideoExtractor: QuartzTransformerPlugin = () => {
               const dirName = file.data.slug.split("/")[0]
               const folderTitles: Record<string, string> = {
                 Art: "审美积累",
-                MathAndPhysics: "数理基础",
-                Portfolio: "个人作品集",
+                MathAndPhysics: "基础知识积累",
+                Portfolio: "个人开发工具",
                 "Tech-Notes": "技术笔记",
               }
               const folderTitle = folderTitles[dirName] || dirName
