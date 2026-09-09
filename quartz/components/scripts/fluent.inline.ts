@@ -507,14 +507,13 @@ function setupGlassVideoPlayers() {
   }
 }
 
-// --- 10. Portfolio Showcase Cards & Video Interaction ---
+// --- 10. Portfolio Showcase Cards & Video Interaction (Solution 1: Hover Intent + Smooth Cross-Fade) ---
 function setupPortfolioShowcase() {
   const showcase = document.getElementById("portfolio-showcase");
   if (!showcase) return;
 
   const cards = showcase.querySelectorAll(".portfolio-card") as NodeListOf<HTMLElement>;
 
-  // Video Cards: Click-only play to avoid any unwanted video traffic/CDN hits
   cards.forEach((card: any) => {
     const video = card.querySelector("video") as HTMLVideoElement | null;
     const cover = card.querySelector(".portfolio-video-cover") as HTMLElement | null;
@@ -522,6 +521,9 @@ function setupPortfolioShowcase() {
     if (!video || !cover) return;
 
     card._isPlayingManual = false;
+    let hoverTimer: any = null;
+    let resetTimer: any = null;
+
     cover.classList.remove("playing");
     cover.classList.remove("previewing");
 
@@ -532,9 +534,54 @@ function setupPortfolioShowcase() {
 
     const targetSrc = video.getAttribute("data-src") || video.dataset.src;
 
-    // Click to Play (Explicit user action only - ZERO traffic before clicking!)
+    // 1. Hover Intent (250ms delay: casual mouse sweeps over cards trigger ZERO requests!)
+    const onMouseEnter = () => {
+      if (card._isPlayingManual) return;
+      if (resetTimer) {
+        clearTimeout(resetTimer);
+        resetTimer = null;
+      }
+
+      hoverTimer = setTimeout(() => {
+        if (card._isPlayingManual) return;
+        if (targetSrc && (!video.src || !video.src.includes(targetSrc))) {
+          video.src = targetSrc;
+        }
+        video.muted = true;
+        cover.classList.add("previewing");
+        const p = video.play();
+        if (p !== undefined) p.catch(() => {});
+      }, 250);
+    };
+
+    // 2. Smooth Leave (Frosted glass smoothly dissolves back over video, then quietly pauses without hard cut)
+    const onMouseLeave = () => {
+      if (hoverTimer) {
+        clearTimeout(hoverTimer);
+        hoverTimer = null;
+      }
+      if (card._isPlayingManual) return;
+
+      // Start frosted glass cross-fade cover (0.35s CSS transition)
+      cover.classList.remove("previewing");
+
+      // Wait until frosted glass has completely veiled the video, then quietly pause & reset
+      resetTimer = setTimeout(() => {
+        if (!card._isPlayingManual) {
+          video.pause();
+          try {
+            video.currentTime = 0;
+          } catch (e) {}
+        }
+      }, 350);
+    };
+
+    // 3. Click to Manual Play (Unmute & seamless continuous playback with full controls)
     const onManualPlay = (e: MouseEvent) => {
       e.stopPropagation();
+      if (hoverTimer) clearTimeout(hoverTimer);
+      if (resetTimer) clearTimeout(resetTimer);
+
       card._isPlayingManual = true;
       cover.classList.remove("previewing");
       cover.classList.add("playing");
@@ -544,10 +591,12 @@ function setupPortfolioShowcase() {
       }
       video.controls = true;
       video.muted = false;
-      video.load();
       const p = video.play();
       if (p !== undefined) p.catch((err) => console.warn("Play error:", err));
     };
+
+    card.addEventListener("mouseenter", onMouseEnter);
+    card.addEventListener("mouseleave", onMouseLeave);
 
     if (playBtn) {
       playBtn.addEventListener("click", onManualPlay);
@@ -564,6 +613,7 @@ function setupPortfolioShowcase() {
     });
   });
 }
+
 
 
 // --- 11. Floating Return-to-Home Button Logic ---
