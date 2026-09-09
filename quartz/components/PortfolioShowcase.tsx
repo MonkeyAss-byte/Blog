@@ -11,8 +11,6 @@ export interface PortfolioItem {
   description: string
   video?: string
   cover?: string
-  tag: string
-  tags: string[]
   order: number
 }
 
@@ -102,27 +100,21 @@ export default (() => {
     // Map to normalized items
     const items: PortfolioItem[] = portfolioFiles.map((file) => {
       const fm = (file.frontmatter as Record<string, any>) ?? {}
-      const fileTags: string[] = Array.isArray(fm.tags) ? fm.tags : []
       const fileDate = getDate(file)
-      const primaryTag = fm.portfolio_tag || fileTags[0] || "技术拆解"
       const order = Number(fm.portfolio_order ?? 999)
-      const video = fm.portfolio_video || fm.video || (file as any).video || ""
+      const video = fm.video || (file as any).video || ""
       const cover = fm.portfolio_cover || fm.cover || ""
-      const desc =
-        fm.portfolio_desc ||
-        fm.description ||
-        ""
+      const desc = fm.description || (file as any).description || ""
+      const title = fm.title || file.slug?.split("/").pop() || "未命名作品"
 
       return {
         slug: file.slug as FullSlug,
-        title: fm.title || file.slug || "未命名作品",
+        title,
         date: fileDate,
         dateStr: formatDate(fileDate),
         description: desc,
         video,
         cover,
-        tag: primaryTag,
-        tags: fileTags,
         order,
       }
     })
@@ -137,23 +129,6 @@ export default (() => {
       return timeB - timeA
     })
 
-    // Collect unique category tags for filter buttons
-    const categorySet = new Set<string>()
-    items.forEach((item) => {
-      if (item.tag) categorySet.add(item.tag)
-      item.tags.forEach((t) => {
-        if (
-          t &&
-          t !== "作品集" &&
-          t.toLowerCase() !== "portfolio" &&
-          categorySet.size < 8
-        ) {
-          categorySet.add(t)
-        }
-      })
-    })
-    const filterTags = Array.from(categorySet).slice(0, 6)
-
     return (
       <section id="portfolio-showcase" class="portfolio-showcase-section">
         <div class="portfolio-header">
@@ -167,35 +142,15 @@ export default (() => {
               实时图形渲染 · Shader 算法 · 引擎管线拆解与工具开发
             </p>
           </div>
-
-          <div class="portfolio-filter-bar">
-            <button class="portfolio-filter-btn active" data-tag="all">
-              <span>全部</span>
-              <span class="filter-count">{items.length}</span>
-            </button>
-            {filterTags.map((tag) => {
-              const count = items.filter(
-                (it) => it.tag === tag || it.tags.includes(tag),
-              ).length
-              return (
-                <button class="portfolio-filter-btn" data-tag={tag}>
-                  <span>{tag}</span>
-                  <span class="filter-count">{count}</span>
-                </button>
-              )
-            })}
-          </div>
         </div>
 
         <div class="portfolio-grid">
           {items.map((item) => {
             const detailUrl = `${resolveRelative(fileData.slug!, item.slug)}?from=portfolio`
-            const allItemTags = [item.tag, ...item.tags].filter(Boolean)
 
             return (
               <div
                 class="portfolio-card"
-                data-tags={JSON.stringify(allItemTags)}
                 data-slug={item.slug}
               >
                 {/* Media area */}
@@ -256,12 +211,11 @@ export default (() => {
 
                 {/* Content area */}
                 <div class="portfolio-card-body">
-                  <div class="portfolio-card-meta">
-                    <span class="portfolio-card-tag">{item.tag}</span>
-                    {item.dateStr && (
+                  {item.dateStr && (
+                    <div class="portfolio-card-meta">
                       <span class="portfolio-card-date">{item.dateStr}</span>
-                    )}
-                  </div>
+                    </div>
+                  )}
 
                   <h3 class="portfolio-card-title">
                     <a href={detailUrl} class="portfolio-card-title-link">

@@ -1038,51 +1038,6 @@ article table {
     line-height: 1.5;
   }
 
-  .portfolio-filter-bar {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.5rem;
-    margin-top: 1.25rem;
-
-    .portfolio-filter-btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.4rem;
-      padding: 0.4rem 0.9rem;
-      border-radius: 8px;
-      font-size: 0.82rem;
-      font-weight: 500;
-      cursor: pointer;
-      border: 1px solid color-mix(in srgb, var(--lightgray) 60%, transparent);
-      background: color-mix(in srgb, var(--light) 70%, transparent);
-      color: var(--darkgray);
-      backdrop-filter: blur(12px);
-      transition: all 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
-
-      .filter-count {
-        font-size: 0.72rem;
-        opacity: 0.7;
-      }
-
-      &:hover {
-        border-color: var(--secondary);
-        color: var(--secondary);
-        transform: translateY(-1px);
-        background: color-mix(in srgb, var(--secondary) 8%, var(--light));
-      }
-
-      &.active {
-        background: var(--secondary);
-        color: #ffffff;
-        border-color: var(--secondary);
-        box-shadow: 0 4px 14px color-mix(in srgb, var(--secondary) 35%, transparent);
-
-        .filter-count {
-          opacity: 0.9;
-        }
-      }
-    }
-  }
 }
 
 @keyframes pulse-dot {
@@ -1148,10 +1103,6 @@ article table {
     .portfolio-card-link-btn .arrow-icon {
       transform: translateX(4px);
     }
-  }
-
-  &.hidden-by-filter {
-    display: none !important;
   }
 }
 
@@ -1317,16 +1268,6 @@ article table {
     justify-content: space-between;
     margin-bottom: 0.65rem;
     font-size: 0.78rem;
-
-    .portfolio-card-tag {
-      display: inline-block;
-      padding: 0.15rem 0.55rem;
-      border-radius: 4px;
-      font-weight: 600;
-      color: var(--secondary);
-      background: color-mix(in srgb, var(--secondary) 12%, transparent);
-      border: 1px solid color-mix(in srgb, var(--secondary) 25%, transparent);
-    }
 
     .portfolio-card-date {
       color: var(--gray);

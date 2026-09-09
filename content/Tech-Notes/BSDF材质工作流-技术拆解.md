@@ -1,15 +1,3 @@
----
-title: BSDF 材质工作流 - 技术拆解
-date: 2026-07-16
-tags:
-  - 图形渲染
-  - BSDF
-  - 次表面散射
-  - Shader
-  - Unity
-description: 基于球谐函数的 BSDF 材质工作流技术拆解，涵盖 SH 深度烘焙、SSS/BRDF LUT 预计算、Kawase 模糊背景及实时 BSDF Shader 渲染管线
----
-
 # BSDF 材质工作流
 
 ## 概述

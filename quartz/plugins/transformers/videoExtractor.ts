@@ -10,7 +10,6 @@ export const VideoExtractor: QuartzTransformerPlugin = () => {
           const fm = (file.data.frontmatter as Record<string, any>) ?? {}
           file.data.frontmatter = fm
 
-          const slug = file.data.slug || ""
           const isExplicitPortfolio = fm.portfolio === true || fm.portfolio === "true"
           const isExplicitNonPortfolio = fm.portfolio === false || fm.portfolio === "false"
 
@@ -29,11 +28,74 @@ export const VideoExtractor: QuartzTransformerPlugin = () => {
             file.data.portfolio = true
           }
 
-          // Video Extraction:
-          // 1. From frontmatter (portfolio_video or video)
+          // 1. Dynamic Title Extraction (if frontmatter title is missing or default stem)
+          if (!fm.title || fm.title === file.stem || fm.title === "Untitled" || fm.title === "index") {
+            const h1Match = content.match(/^#\s+(.+)$/m)
+            if (h1Match) {
+              const cleanTitle = h1Match[1].trim()
+              fm.title = cleanTitle
+              file.data.title = cleanTitle
+            } else if (file.data.slug && file.data.slug.endsWith("/index")) {
+              const dirName = file.data.slug.split("/")[0]
+              const folderTitles: Record<string, string> = {
+                Art: "审美积累",
+                MathAndPhysics: "数理基础",
+                Portfolio: "个人作品集",
+                "Tech-Notes": "技术笔记",
+              }
+              const folderTitle = folderTitles[dirName] || dirName
+              fm.title = folderTitle
+              file.data.title = folderTitle
+            }
+          }
+
+          // 2. Dynamic Description Extraction (if frontmatter description is missing)
+          if (!fm.description) {
+            const bodyOnly = content
+              .replace(/^---[\s\S]*?---\r?\n?/, "")
+              .replace(/<div class="glass-video-card"[\s\S]*?<\/div>/gi, "")
+              .replace(/<video[\s\S]*?<\/video>/gi, "")
+              .replace(/\$\$[\s\S]*?\$\$/g, "")
+              .replace(/<[^>]+>/g, "")
+            const lines = bodyOnly.split("\n")
+            for (const rawLine of lines) {
+              const line = rawLine.trim()
+              if (
+                !line ||
+                line.startsWith("#") ||
+                line.startsWith("---") ||
+                line.startsWith("```") ||
+                line.startsWith("!") ||
+                line.startsWith(">") ||
+                line.startsWith("|") ||
+                line.startsWith("$$") ||
+                line.startsWith("$") ||
+                line.startsWith("<!--")
+              ) {
+                continue
+              }
+              // Clean list bullets and inline markdown formatting
+              const cleanedText = line
+                .replace(/^[-*+]\s+/, "")
+                .replace(/\[\[[^\]|]+\|?([^\]]*)\]\]/g, "$1")
+                .replace(/\[([^\]]+)\]\([^)]+\)/g, "$1")
+                .replace(/[*_`~]/g, "")
+                .trim()
+
+              if (cleanedText.length > 10) {
+                const desc = cleanedText.length > 160 ? cleanedText.slice(0, 157) + "..." : cleanedText
+                fm.description = desc
+                file.data.description = desc
+                break
+              }
+            }
+          }
+
+          // 3. Video Extraction:
+          // Check frontmatter first (portfolio_video or video)
           let videoUrl = fm.portfolio_video || fm.video
 
-          // 2. If not specified, scan markdown body for <video ... data-src="..."> or src="..."
+          // If not specified, scan markdown body for <video ... data-src="..."> or src="..."
           if (!videoUrl) {
             const dataSrcMatch = content.match(/<video[^>]+data-src=["']([^"']+)["']/i)
             if (dataSrcMatch) {
@@ -68,3 +130,4 @@ export const VideoExtractor: QuartzTransformerPlugin = () => {
     },
   }
 }
+

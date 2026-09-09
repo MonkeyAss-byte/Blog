@@ -1,11 +1,3 @@
----
-title: Image Based Lighting
-date: 2026-08-10
-tags:
-  - 渲染基础
-  - 物理原理
-description: 对于双向分布函数的IBL的工程实现
----
 # IBL
 
 > Image Based Lighting多在工程中应用于环境光,分别针对于BRDF中的漫反射与镜面反射

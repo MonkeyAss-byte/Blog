@@ -512,37 +512,9 @@ function setupPortfolioShowcase() {
   const showcase = document.getElementById("portfolio-showcase");
   if (!showcase) return;
 
-  // 1. Tag Filtering
-  const filterBtns = showcase.querySelectorAll(".portfolio-filter-btn") as NodeListOf<HTMLButtonElement>;
   const cards = showcase.querySelectorAll(".portfolio-card") as NodeListOf<HTMLElement>;
 
-  filterBtns.forEach((btn) => {
-    btn.onclick = () => {
-      const targetTag = btn.getAttribute("data-tag");
-      filterBtns.forEach((b) => b.classList.remove("active"));
-      btn.classList.add("active");
-
-      cards.forEach((card) => {
-        if (targetTag === "all") {
-          card.classList.remove("hidden-by-filter");
-        } else {
-          try {
-            const rawTags = card.getAttribute("data-tags") || "[]";
-            const tags = JSON.parse(rawTags) as string[];
-            if (tags.some((t) => t.toLowerCase() === targetTag?.toLowerCase())) {
-              card.classList.remove("hidden-by-filter");
-            } else {
-              card.classList.add("hidden-by-filter");
-            }
-          } catch {
-            card.classList.remove("hidden-by-filter");
-          }
-        }
-      });
-    };
-  });
-
-  // 2. Video Cards (Hover preview + Click manual play)
+  // Video Cards: Click-only play to avoid any unwanted video traffic/CDN hits
   cards.forEach((card: any) => {
     const video = card.querySelector("video") as HTMLVideoElement | null;
     const cover = card.querySelector(".portfolio-video-cover") as HTMLElement | null;
@@ -560,25 +532,7 @@ function setupPortfolioShowcase() {
 
     const targetSrc = video.getAttribute("data-src") || video.dataset.src;
 
-    // Hover to Preview (Muted loop preview)
-    const onMouseEnter = () => {
-      if (card._isPlayingManual) return;
-      if (targetSrc && (!video.src || !video.src.includes(targetSrc))) {
-        video.src = targetSrc;
-      }
-      video.muted = true;
-      cover.classList.add("previewing");
-      const p = video.play();
-      if (p !== undefined) p.catch(() => {});
-    };
-
-    const onMouseLeave = () => {
-      if (card._isPlayingManual) return;
-      cover.classList.remove("previewing");
-      video.pause();
-    };
-
-    // Click to Manual Play (With audio & full controls)
+    // Click to Play (Explicit user action only - ZERO traffic before clicking!)
     const onManualPlay = (e: MouseEvent) => {
       e.stopPropagation();
       card._isPlayingManual = true;
@@ -595,9 +549,6 @@ function setupPortfolioShowcase() {
       if (p !== undefined) p.catch((err) => console.warn("Play error:", err));
     };
 
-    card.addEventListener("mouseenter", onMouseEnter);
-    card.addEventListener("mouseleave", onMouseLeave);
-
     if (playBtn) {
       playBtn.addEventListener("click", onManualPlay);
     }
@@ -613,6 +564,7 @@ function setupPortfolioShowcase() {
     });
   });
 }
+
 
 // --- 11. Floating Return-to-Home Button Logic ---
 function setupFloatingNav() {

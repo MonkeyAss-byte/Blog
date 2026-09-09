@@ -1,17 +1,6 @@
 ---
-title: Project Graph 扩展开发 - PRG to Markdown 技术拆解
-date: 2026-07-13
-tags:
-  - Project Graph
-  - 扩展开发
-  - Web Worker
-  - Comlink
-  - Markdown
-  - TypeScript
-description: Project Graph 扩展 "PRG to Markdown (with Pic)" 的完整技术拆解，涵盖多线程架构、数据解析、递归提取与排版引擎
 portfolio: false
 portfolio_order: 6
-portfolio_tag: 工具开发 / 扩展架构
 ---
 
 # Project Graph 扩展开发 

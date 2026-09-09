@@ -1,10 +1,3 @@
----
-title: Unity导出管线流程与框架
-date: 2026-08-17
-tags:
-  - 工具
-description: 即Unity的资产导入管线流程与框架
----
 # Unity资产管线流程与框架
 ## AssetPostprocessor与ScriptedImporter（资产导入 与资产操作之后（OnPostProcessAllAssets）
 ### 流程图
