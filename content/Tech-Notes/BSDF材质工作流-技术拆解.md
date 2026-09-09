@@ -197,10 +197,10 @@ Kawase 模糊是一种高效的近似高斯模糊，通过对角线采样实现�
 
 ### 4.3 相关文件
 
-| 文件 | 作用 |
-|------|------|
+| 文件                                          | 作用                              |
+| ------------------------------------------- | ------------------------------- |
 | `Scripts/TransmittanceObjectDrawFeature.cs` | URP RendererFeature，管理整个渲染 Pass |
-| `Resources/Shaders/KawaseBlur.shader` | Kawase 降采样/升采样 Shader |
+| `Resources/Shaders/KawaseBlur.shader`       | Kawase 降采样/升采样 Shader           |
 
 ### 4.4 TransmittanceObjectDrawFeature 关键代码解析
 
