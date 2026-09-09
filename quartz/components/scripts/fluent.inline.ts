@@ -447,6 +447,17 @@ function stopAllMedia() {
     const video = card.querySelector("video");
     if (video) video.controls = false;
   });
+
+  document.querySelectorAll(".portfolio-card").forEach((card: any) => {
+    card._isPlayingManual = false;
+    const cover = card.querySelector(".portfolio-video-cover");
+    if (cover) {
+      cover.classList.remove("playing");
+      cover.classList.remove("previewing");
+    }
+    const video = card.querySelector("video");
+    if (video) video.controls = false;
+  });
 }
 
 function setupGlassVideoPlayers() {
@@ -496,6 +507,146 @@ function setupGlassVideoPlayers() {
   }
 }
 
+// --- 10. Portfolio Showcase Cards & Video Interaction ---
+function setupPortfolioShowcase() {
+  const showcase = document.getElementById("portfolio-showcase");
+  if (!showcase) return;
+
+  // 1. Tag Filtering
+  const filterBtns = showcase.querySelectorAll(".portfolio-filter-btn") as NodeListOf<HTMLButtonElement>;
+  const cards = showcase.querySelectorAll(".portfolio-card") as NodeListOf<HTMLElement>;
+
+  filterBtns.forEach((btn) => {
+    btn.onclick = () => {
+      const targetTag = btn.getAttribute("data-tag");
+      filterBtns.forEach((b) => b.classList.remove("active"));
+      btn.classList.add("active");
+
+      cards.forEach((card) => {
+        if (targetTag === "all") {
+          card.classList.remove("hidden-by-filter");
+        } else {
+          try {
+            const rawTags = card.getAttribute("data-tags") || "[]";
+            const tags = JSON.parse(rawTags) as string[];
+            if (tags.some((t) => t.toLowerCase() === targetTag?.toLowerCase())) {
+              card.classList.remove("hidden-by-filter");
+            } else {
+              card.classList.add("hidden-by-filter");
+            }
+          } catch {
+            card.classList.remove("hidden-by-filter");
+          }
+        }
+      });
+    };
+  });
+
+  // 2. Video Cards (Hover preview + Click manual play)
+  cards.forEach((card: any) => {
+    const video = card.querySelector("video") as HTMLVideoElement | null;
+    const cover = card.querySelector(".portfolio-video-cover") as HTMLElement | null;
+    const playBtn = card.querySelector(".portfolio-play-btn") as HTMLElement | null;
+    if (!video || !cover) return;
+
+    card._isPlayingManual = false;
+    cover.classList.remove("playing");
+    cover.classList.remove("previewing");
+
+    video.setAttribute("controlsList", "nodownload noplaybackrate nopictureinpicture");
+    video.disablePictureInPicture = true;
+    (video as any).disableRemotePlayback = true;
+    video.addEventListener("contextmenu", (e) => e.preventDefault());
+
+    const targetSrc = video.getAttribute("data-src") || video.dataset.src;
+
+    // Hover to Preview (Muted loop preview)
+    const onMouseEnter = () => {
+      if (card._isPlayingManual) return;
+      if (targetSrc && (!video.src || !video.src.includes(targetSrc))) {
+        video.src = targetSrc;
+      }
+      video.muted = true;
+      cover.classList.add("previewing");
+      const p = video.play();
+      if (p !== undefined) p.catch(() => {});
+    };
+
+    const onMouseLeave = () => {
+      if (card._isPlayingManual) return;
+      cover.classList.remove("previewing");
+      video.pause();
+    };
+
+    // Click to Manual Play (With audio & full controls)
+    const onManualPlay = (e: MouseEvent) => {
+      e.stopPropagation();
+      card._isPlayingManual = true;
+      cover.classList.remove("previewing");
+      cover.classList.add("playing");
+
+      if (targetSrc && (!video.src || !video.src.includes(targetSrc))) {
+        video.src = targetSrc;
+      }
+      video.controls = true;
+      video.muted = false;
+      video.load();
+      const p = video.play();
+      if (p !== undefined) p.catch((err) => console.warn("Play error:", err));
+    };
+
+    card.addEventListener("mouseenter", onMouseEnter);
+    card.addEventListener("mouseleave", onMouseLeave);
+
+    if (playBtn) {
+      playBtn.addEventListener("click", onManualPlay);
+    }
+    cover.addEventListener("click", onManualPlay);
+
+    // Save referrer when clicking note links
+    card.querySelectorAll("a").forEach((link: HTMLAnchorElement) => {
+      link.addEventListener("click", () => {
+        try {
+          sessionStorage.setItem("came_from_portfolio", "true");
+        } catch (e) {}
+      });
+    });
+  });
+}
+
+// --- 11. Floating Return-to-Home Button Logic ---
+function setupFloatingNav() {
+  const nav = document.getElementById("portfolio-floating-nav");
+  if (!nav) return;
+
+  const checkReferrer = () => {
+    let fromPortfolio = false;
+    try {
+      fromPortfolio =
+        sessionStorage.getItem("came_from_portfolio") === "true" ||
+        window.location.search.includes("from=portfolio") ||
+        document.referrer.includes("portfolio") ||
+        nav.getAttribute("data-is-portfolio") === "true";
+    } catch (e) {}
+
+    if (fromPortfolio) {
+      nav.setAttribute("data-is-portfolio", "true");
+    }
+  };
+
+  checkReferrer();
+
+  const btn = nav.querySelector(".portfolio-floating-btn") as HTMLAnchorElement | null;
+  if (btn) {
+    btn.onclick = (e) => {
+      // If we came from portfolio, smooth scroll after navigation
+      try {
+        sessionStorage.removeItem("came_from_portfolio");
+      } catch (e) {}
+    };
+  }
+}
+
 // Stop video immediately when navigating away
 document.addEventListener("prenav", stopAllMedia);
 window.addEventListener("pagehide", stopAllMedia);
@@ -503,28 +654,21 @@ if (typeof (window as any).addCleanup === "function") {
   (window as any).addCleanup(stopAllMedia);
 }
 
-document.addEventListener("nav", () => {
+function initAllFeatures() {
   setupFluentMotion();
   setupMobileInteraction();
   setupDarkmodeTransition();
   setupImageZoom();
   setupCustomCursor();
   setupGlassVideoPlayers();
-});
-window.addEventListener("DOMContentLoaded", () => {
-  setupFluentMotion();
-  setupMobileInteraction();
-  setupDarkmodeTransition();
-  setupImageZoom();
-  setupCustomCursor();
-  setupGlassVideoPlayers();
-});
+  setupPortfolioShowcase();
+  setupFloatingNav();
+}
+
+document.addEventListener("nav", initAllFeatures);
+window.addEventListener("DOMContentLoaded", initAllFeatures);
 // Run once immediately in case DOM is already loaded
-setupFluentMotion();
-setupMobileInteraction();
-setupDarkmodeTransition();
-setupImageZoom();
-setupCustomCursor();
-setupGlassVideoPlayers();
+initAllFeatures();
+
 
 

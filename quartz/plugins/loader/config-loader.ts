@@ -473,7 +473,7 @@ export async function loadQuartzConfig(
 
   // Import built-in plugins
   const builtinPlugins = await import("../index")
-  const builtinTransformers: unknown[] = []
+  const builtinTransformers: unknown[] = [builtinPlugins.VideoExtractor()]
   const builtinEmitters = [
     builtinPlugins.ComponentResources(),
     builtinPlugins.Assets(),
@@ -482,7 +482,7 @@ export async function loadQuartzConfig(
   const builtinPageTypes = [builtinPlugins.PageTypes.NotFoundPageType()]
 
   const plugins: PluginTypes = {
-    transformers: [...builtinTransformers, ...(await instantiate(transformers, "transformer"))],
+    transformers: [...(await instantiate(transformers, "transformer")), ...(builtinTransformers as any)],
     filters: await instantiate(filters, "filter"),
     emitters: [...builtinEmitters, ...(await instantiate(emitters, "emitter"))],
     pageTypes: [...(await instantiate(pageTypes, "pageType")), ...builtinPageTypes],
@@ -708,12 +708,22 @@ export async function loadQuartzLayout(layoutOverrides?: {
     defaultLayout.footer = footer
   }
 
+  // Add PortfolioShowcase component to afterBody
+  const PortfolioShowcaseModule = await import("../../components/PortfolioShowcase")
+  const PortfolioShowcase = PortfolioShowcaseModule.default()
+  defaultLayout.afterBody = defaultLayout.afterBody ?? []
+  defaultLayout.afterBody.push(PortfolioShowcase)
+
   // Ensure all byPageType entries inherit structural slots
   for (const pageType of Object.keys(byPageType)) {
     const pt = byPageType[pageType]
     if (!pt.head) pt.head = head
     if (!pt.header) pt.header = []
     if (footer && !pt.footer) pt.footer = footer
+    if (pageType !== "404") {
+      pt.afterBody = pt.afterBody ?? []
+      pt.afterBody.push(PortfolioShowcase)
+    }
   }
 
   const mergedDefaults = { ...defaultLayout, ...layoutOverrides?.defaults }
