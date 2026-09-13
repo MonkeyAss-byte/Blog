@@ -1,4 +1,7 @@
 import { QuartzTransformerPlugin } from "../types"
+import { visit } from "unist-util-visit"
+import type { Root, Element } from "hast"
+import type { VFile } from "vfile"
 
 export const VideoExtractor: QuartzTransformerPlugin = () => {
   return {
@@ -125,9 +128,98 @@ export const VideoExtractor: QuartzTransformerPlugin = () => {
             fm.video = videoUrl
             file.data.video = videoUrl
           }
+
+          // 4. Cover Mode & Explicit Cover Extraction
+          const rawCover = String(
+            fm.portfolio_cover ?? fm.cover ?? fm.cover_mode ?? "",
+          ).trim()
+          const lowerCover = rawCover.toLowerCase()
+
+          let explicitMode: "frame" | "image" | undefined
+          let explicitCoverUrl: string | undefined
+
+          if (["frame", "video", "第一帧", "first_frame", "video_frame"].includes(lowerCover)) {
+            explicitMode = "frame"
+          } else if (["image", "img", "图片", "第一张图片", "first_image"].includes(lowerCover)) {
+            explicitMode = "image"
+          } else if (
+            rawCover &&
+            (rawCover.startsWith("http://") ||
+              rawCover.startsWith("https://") ||
+              rawCover.startsWith("./") ||
+              rawCover.startsWith("/") ||
+              rawCover.includes("."))
+          ) {
+            explicitMode = "image"
+            explicitCoverUrl = rawCover
+          }
+
+          ;(file.data as any).explicitCoverMode = explicitMode
+          ;(file.data as any).explicitCoverUrl = explicitCoverUrl
+        },
+      ]
+    },
+    htmlPlugins() {
+      return [
+        () => (tree: Root, file: VFile) => {
+          const fm = (file.data.frontmatter as Record<string, any>) ?? {}
+          if (!fm.portfolio) return
+
+          // Search HAST tree for the first <img>
+          let firstHtmlImg: string | undefined
+          visit(tree, "element", (node: Element) => {
+            if (
+              !firstHtmlImg &&
+              node.tagName === "img" &&
+              node.properties &&
+              typeof node.properties.src === "string"
+            ) {
+              firstHtmlImg = node.properties.src
+            }
+          })
+
+          let resolvedImage = (file.data as any).explicitCoverUrl
+
+          if (!resolvedImage && firstHtmlImg) {
+            if (
+              firstHtmlImg.startsWith("http://") ||
+              firstHtmlImg.startsWith("https://") ||
+              firstHtmlImg.startsWith("data:")
+            ) {
+              resolvedImage = firstHtmlImg
+            } else {
+              try {
+                // Resolving relative to index/root
+                const slugStr = typeof file.data.slug === "string" ? file.data.slug : ""
+                const resolved = new URL(firstHtmlImg, "https://base.com/" + slugStr)
+                resolvedImage = "." + decodeURIComponent(resolved.pathname)
+              } catch {
+                resolvedImage = firstHtmlImg
+              }
+            }
+          }
+
+          const explicitMode = (file.data as any).explicitCoverMode
+          let finalCoverMode: "frame" | "image" = "frame"
+
+          if (explicitMode === "frame") {
+            finalCoverMode = "frame"
+          } else if (explicitMode === "image") {
+            finalCoverMode = resolvedImage ? "image" : "frame"
+          } else {
+            // Default: if an image exists in the note, default to image; otherwise frame
+            finalCoverMode = resolvedImage ? "image" : "frame"
+          }
+
+          ;(file.data as any).coverMode = finalCoverMode
+          ;(file.data as any).coverImage = resolvedImage || ""
+          fm.cover_mode = finalCoverMode
+          fm.cover = resolvedImage || ""
+          fm.portfolio_cover = finalCoverMode === "frame" ? "frame" : (resolvedImage || "image")
         },
       ]
     },
   }
 }
+
 

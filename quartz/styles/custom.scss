@@ -1092,6 +1092,10 @@ article table {
       .portfolio-fallback-mesh {
         transform: scale(1.08);
       }
+      .portfolio-cover-img {
+        transform: scale(1.04);
+      }
+
       .portfolio-play-btn {
         transform: scale(1.12);
         background: rgba(255, 255, 255, 0.32);
@@ -1131,6 +1135,22 @@ article table {
     position: relative;
     width: 100%;
     height: 100%;
+
+    .portfolio-cover-img {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      margin: 0 !important;
+      border: none !important;
+      border-radius: 0 !important;
+      box-shadow: none !important;
+      z-index: 1;
+      pointer-events: none;
+      transition: transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.35s ease;
+    }
 
     video {
       position: relative;

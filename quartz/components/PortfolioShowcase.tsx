@@ -11,6 +11,7 @@ export interface PortfolioItem {
   description: string
   video?: string
   cover?: string
+  coverMode: "frame" | "image"
   order: number
 }
 
@@ -103,7 +104,12 @@ export default (() => {
       const fileDate = getDate(file)
       const order = Number(fm.portfolio_order ?? 999)
       const video = fm.video || (file as any).video || ""
-      const cover = fm.portfolio_cover || fm.cover || ""
+      const cover = fm.cover || (file as any).coverImage || (file as any).cover || ""
+      const rawMode = String(fm.cover_mode || fm.portfolio_cover || (file as any).coverMode || "").toLowerCase()
+      const coverMode: "frame" | "image" =
+        rawMode === "frame" || rawMode === "第一帧" || !cover
+          ? "frame"
+          : "image"
       const desc = fm.description || (file as any).description || ""
       const title = fm.title || file.slug?.split("/").pop() || "未命名作品"
 
@@ -115,6 +121,7 @@ export default (() => {
         description: desc,
         video,
         cover,
+        coverMode,
         order,
       }
     })
@@ -156,16 +163,26 @@ export default (() => {
                 {/* Media area */}
                 <div class="portfolio-card-media">
                   {item.video ? (
-                    <div class="portfolio-video-wrapper">
+                    <div class="portfolio-video-wrapper" data-cover-mode={item.coverMode}>
+                      {/* If in image mode, render the note's first image underneath frosted glass */}
+                      {item.coverMode === "image" && item.cover && (
+                        <img
+                          class="portfolio-cover-img"
+                          src={item.cover}
+                          alt={item.title}
+                          loading="lazy"
+                          decoding="async"
+                        />
+                      )}
                       <video
                         playsinline
-                        preload="none"
+                        preload={item.coverMode === "frame" ? "metadata" : "none"}
                         muted
                         loop
                         controlsList="nodownload noplaybackrate nopictureinpicture"
                         disablePictureInPicture
                         data-src={item.video}
-                        poster={item.cover || undefined}
+                        src={item.coverMode === "frame" && item.video ? `${item.video}#t=0.001` : undefined}
                       >
                         您的浏览器不支持直接播放视频。
                       </video>
@@ -181,7 +198,7 @@ export default (() => {
                         </div>
                         <div class="portfolio-video-badge">
                           <span class="video-dot"></span>
-                          <span>DEMO VIDEO</span>
+                          <span>{item.coverMode === "frame" ? "FRAME PREVIEW" : "DEMO VIDEO"}</span>
                         </div>
                       </div>
                     </div>

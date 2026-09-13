@@ -533,6 +533,8 @@ function setupPortfolioShowcase() {
     video.addEventListener("contextmenu", (e) => e.preventDefault());
 
     const targetSrc = video.getAttribute("data-src") || video.dataset.src;
+    const wrapper = card.querySelector(".portfolio-video-wrapper");
+    const isFrameMode = wrapper?.getAttribute("data-cover-mode") === "frame";
 
     // 1. Hover Intent (250ms delay: casual mouse sweeps over cards trigger ZERO requests!)
     const onMouseEnter = () => {
@@ -570,7 +572,14 @@ function setupPortfolioShowcase() {
         if (!card._isPlayingManual) {
           video.pause();
           try {
-            video.currentTime = 0;
+            if (isFrameMode) {
+              video.currentTime = 0.001;
+            } else {
+              video.currentTime = 0;
+              // Resetting src makes video canvas transparent so first image shines through under frosted glass
+              video.removeAttribute("src");
+              video.load();
+            }
           } catch (e) {}
         }
       }, 350);
