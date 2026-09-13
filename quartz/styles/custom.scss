@@ -990,54 +990,21 @@ article table {
 }
 
 .portfolio-header {
-  margin-bottom: 2.2rem;
+  margin-bottom: 1.8rem;
 
   .portfolio-title-group {
-    margin-bottom: 1.5rem;
-  }
-
-  .portfolio-badge-pill {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.25rem 0.75rem;
-    border-radius: 9999px;
-    font-size: 0.75rem;
-    font-weight: 700;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    color: var(--secondary);
-    background: color-mix(in srgb, var(--secondary) 12%, transparent);
-    border: 1px solid color-mix(in srgb, var(--secondary) 25%, transparent);
-    margin-bottom: 0.75rem;
-
-    .portfolio-pulse-dot {
-      width: 7px;
-      height: 7px;
-      border-radius: 50%;
-      background: var(--secondary);
-      box-shadow: 0 0 8px var(--secondary);
-      animation: pulse-dot 2s infinite cubic-bezier(0.4, 0, 0.6, 1);
-    }
+    margin-bottom: 0;
   }
 
   .portfolio-title {
-    font-size: 1.95rem;
+    font-size: 2.1rem;
     font-weight: 800;
-    margin: 0.2rem 0 0.5rem 0;
+    margin: 0;
     letter-spacing: -0.02em;
     background: linear-gradient(135deg, var(--dark) 0%, color-mix(in srgb, var(--secondary) 80%, var(--dark)) 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
   }
-
-  .portfolio-subtitle {
-    font-size: 0.95rem;
-    color: var(--gray);
-    margin: 0;
-    line-height: 1.5;
-  }
-
 }
 
 @keyframes pulse-dot {

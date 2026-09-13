@@ -140,14 +140,7 @@ export default (() => {
       <section id="portfolio-showcase" class="portfolio-showcase-section">
         <div class="portfolio-header">
           <div class="portfolio-title-group">
-            <div class="portfolio-badge-pill">
-              <span class="portfolio-pulse-dot"></span>
-              <span>SHOWCASE &amp; DEMOS</span>
-            </div>
-            <h2 class="portfolio-title">精选作品与技术拆解</h2>
-            <p class="portfolio-subtitle">
-              实时图形渲染 · Shader 算法 · 引擎管线拆解与工具开发
-            </p>
+            <h2 class="portfolio-title">作品与技术拆解</h2>
           </div>
         </div>
 

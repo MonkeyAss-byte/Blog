@@ -474,6 +474,65 @@ function stopAllMedia() {
   });
 }
 
+// Helper: Stop and reset all playing videos except the designated one (exclusive playback)
+function deactivateOtherVideos(exceptVideo?: HTMLVideoElement | null, exceptCard?: HTMLElement | null) {
+  // 1. Deactivate other portfolio cards
+  document.querySelectorAll(".portfolio-card").forEach((card: any) => {
+    const video = card.querySelector("video") as HTMLVideoElement | null;
+    if (card === exceptCard || (exceptVideo && video === exceptVideo)) {
+      return;
+    }
+
+    if (card._hoverTimer) {
+      clearTimeout(card._hoverTimer);
+      card._hoverTimer = null;
+    }
+    if (card._resetTimer) {
+      clearTimeout(card._resetTimer);
+      card._resetTimer = null;
+    }
+
+    card._isPlayingManual = false;
+
+    const cover = card.querySelector(".portfolio-video-cover") as HTMLElement | null;
+    if (cover) {
+      cover.classList.remove("playing");
+      cover.classList.remove("previewing");
+    }
+
+    if (video) {
+      video.pause();
+      video.controls = false;
+      const wrapper = card.querySelector(".portfolio-video-wrapper");
+      const isFrameMode = wrapper?.getAttribute("data-cover-mode") === "frame";
+      try {
+        if (isFrameMode) {
+          video.currentTime = 0.001;
+        } else {
+          video.currentTime = 0;
+          video.removeAttribute("src");
+          video.load();
+        }
+      } catch (e) {}
+    }
+  });
+
+  // 2. Deactivate any open glass-video-card in note embeds
+  document.querySelectorAll(".glass-video-card").forEach((card: any) => {
+    const video = card.querySelector("video") as HTMLVideoElement | null;
+    if (exceptVideo && video === exceptVideo) return;
+
+    if (video) {
+      video.pause();
+      video.controls = false;
+    }
+    const cover = card.querySelector(".glass-video-cover") as HTMLElement | null;
+    if (cover) {
+      cover.classList.remove("playing");
+    }
+  });
+}
+
 function setupGlassVideoPlayers() {
   // Ensure any media from previous page / micromorph is stopped
   stopAllMedia();
@@ -498,6 +557,7 @@ function setupGlassVideoPlayers() {
     }
 
     const clickHandler = () => {
+      deactivateOtherVideos(video);
       const targetSrc = video.getAttribute("data-src") || video.dataset.src;
       if (targetSrc && (!video.src || !video.src.includes(targetSrc))) {
         video.src = targetSrc;
@@ -518,10 +578,14 @@ function setupGlassVideoPlayers() {
 
     (card as any)._glassClickHandler = clickHandler;
     cover.addEventListener("click", clickHandler);
+
+    video.addEventListener("play", () => {
+      deactivateOtherVideos(video);
+    });
   }
 }
 
-// --- 10. Portfolio Showcase Cards & Video Interaction (Solution 1: Hover Intent + Smooth Cross-Fade) ---
+// --- 10. Portfolio Showcase Cards & Video Interaction (Exclusive Single-Video Playback) ---
 function setupPortfolioShowcase() {
   const showcase = document.getElementById("portfolio-showcase");
   if (!showcase) return;
@@ -535,8 +599,8 @@ function setupPortfolioShowcase() {
     if (!video || !cover) return;
 
     card._isPlayingManual = false;
-    let hoverTimer: any = null;
-    let resetTimer: any = null;
+    card._hoverTimer = null;
+    card._resetTimer = null;
 
     cover.classList.remove("playing");
     cover.classList.remove("previewing");
@@ -570,6 +634,7 @@ function setupPortfolioShowcase() {
         // In Chrome/Edge, briefly invoking play() on a muted video spins up the hardware decoder
         // to paint the first frame onto the canvas, then immediately pausing freezes that frame.
         if (video.paused && !card._isPlayingManual && !cover.classList.contains("previewing")) {
+          (video as any)._isPrimingFrame = true;
           const p = video.play();
           if (p !== undefined) {
             p.then(() => {
@@ -577,7 +642,15 @@ function setupPortfolioShowcase() {
                 video.pause();
                 video.currentTime = 0.001;
               }
-            }).catch(() => {});
+            })
+              .catch(() => {})
+              .finally(() => {
+                setTimeout(() => {
+                  (video as any)._isPrimingFrame = false;
+                }, 80);
+              });
+          } else {
+            (video as any)._isPrimingFrame = false;
           }
         }
       };
@@ -590,16 +663,19 @@ function setupPortfolioShowcase() {
       }
     }
 
-    // 1. Hover Intent (250ms delay: casual mouse sweeps over cards trigger ZERO requests!)
+    // 1. Hover Intent (250ms delay: casual mouse sweeps trigger ZERO network requests)
     const onMouseEnter = () => {
       if (card._isPlayingManual) return;
-      if (resetTimer) {
-        clearTimeout(resetTimer);
-        resetTimer = null;
+      if (card._resetTimer) {
+        clearTimeout(card._resetTimer);
+        card._resetTimer = null;
       }
 
-      hoverTimer = setTimeout(() => {
+      card._hoverTimer = setTimeout(() => {
         if (card._isPlayingManual) return;
+        // Exclusive playback: deactivate any other active video when hover preview activates
+        deactivateOtherVideos(video, card);
+
         if (targetSrc && (!video.src || !video.src.includes(targetSrc))) {
           video.src = targetSrc;
         }
@@ -612,9 +688,9 @@ function setupPortfolioShowcase() {
 
     // 2. Smooth Leave (Frosted glass smoothly dissolves back over video, then quietly pauses without hard cut)
     const onMouseLeave = () => {
-      if (hoverTimer) {
-        clearTimeout(hoverTimer);
-        hoverTimer = null;
+      if (card._hoverTimer) {
+        clearTimeout(card._hoverTimer);
+        card._hoverTimer = null;
       }
       if (card._isPlayingManual) return;
 
@@ -622,7 +698,7 @@ function setupPortfolioShowcase() {
       cover.classList.remove("previewing");
 
       // Wait until frosted glass has completely veiled the video, then quietly pause & reset
-      resetTimer = setTimeout(() => {
+      card._resetTimer = setTimeout(() => {
         if (!card._isPlayingManual) {
           video.pause();
           try {
@@ -630,7 +706,6 @@ function setupPortfolioShowcase() {
               video.currentTime = 0.001;
             } else {
               video.currentTime = 0;
-              // Resetting src makes video canvas transparent so first image shines through under frosted glass
               video.removeAttribute("src");
               video.load();
             }
@@ -639,11 +714,20 @@ function setupPortfolioShowcase() {
       }, 350);
     };
 
-    // 3. Click to Manual Play (Unmute & seamless continuous playback with full controls)
+    // 3. Click to Manual Play (Exclusive single playback with full controls)
     const onManualPlay = (e: MouseEvent) => {
       e.stopPropagation();
-      if (hoverTimer) clearTimeout(hoverTimer);
-      if (resetTimer) clearTimeout(resetTimer);
+      if (card._hoverTimer) {
+        clearTimeout(card._hoverTimer);
+        card._hoverTimer = null;
+      }
+      if (card._resetTimer) {
+        clearTimeout(card._resetTimer);
+        card._resetTimer = null;
+      }
+
+      // Deactivate all other videos immediately so only this video plays
+      deactivateOtherVideos(video, card);
 
       card._isPlayingManual = true;
       cover.classList.remove("previewing");
@@ -657,6 +741,29 @@ function setupPortfolioShowcase() {
       const p = video.play();
       if (p !== undefined) p.catch((err) => console.warn("Play error:", err));
     };
+
+    // Ensure any native play event on this video halts other videos
+    video.addEventListener("play", () => {
+      if ((video as any)._isPrimingFrame) return;
+      deactivateOtherVideos(video, card);
+    });
+
+    // Reset back to covered card once playback ends
+    video.addEventListener("ended", () => {
+      card._isPlayingManual = false;
+      cover.classList.remove("playing");
+      cover.classList.remove("previewing");
+      video.controls = false;
+      try {
+        if (isFrameMode) {
+          video.currentTime = 0.001;
+        } else {
+          video.currentTime = 0;
+          video.removeAttribute("src");
+          video.load();
+        }
+      } catch (e) {}
+    });
 
     card.addEventListener("mouseenter", onMouseEnter);
     card.addEventListener("mouseleave", onMouseLeave);
