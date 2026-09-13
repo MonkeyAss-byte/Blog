@@ -176,7 +176,7 @@ export default (() => {
                       )}
                       <video
                         playsinline
-                        preload={item.coverMode === "frame" ? "metadata" : "none"}
+                        preload={item.coverMode === "frame" ? "auto" : "none"}
                         muted
                         loop
                         controlsList="nodownload noplaybackrate nopictureinpicture"

@@ -432,7 +432,7 @@ function setupCustomCursor() {
 
 // --- 9. Frosted-Glass Video Player & SPA Media Lifecycle ---
 function stopAllMedia() {
-  document.querySelectorAll("video, audio").forEach((media) => {
+  document.querySelectorAll(".glass-video-card video, audio").forEach((media) => {
     try {
       const m = media as HTMLMediaElement;
       m.pause();
@@ -455,8 +455,22 @@ function stopAllMedia() {
       cover.classList.remove("playing");
       cover.classList.remove("previewing");
     }
-    const video = card.querySelector("video");
-    if (video) video.controls = false;
+    const video = card.querySelector("video") as HTMLVideoElement | null;
+    if (video) {
+      video.pause();
+      video.controls = false;
+      const isFrameMode = card.querySelector(".portfolio-video-wrapper")?.getAttribute("data-cover-mode") === "frame";
+      if (!isFrameMode) {
+        try {
+          video.removeAttribute("src");
+          video.load();
+        } catch (e) {}
+      } else {
+        try {
+          video.currentTime = 0.001;
+        } catch (e) {}
+      }
+    }
   });
 }
 
@@ -535,6 +549,46 @@ function setupPortfolioShowcase() {
     const targetSrc = video.getAttribute("data-src") || video.dataset.src;
     const wrapper = card.querySelector(".portfolio-video-wrapper");
     const isFrameMode = wrapper?.getAttribute("data-cover-mode") === "frame";
+
+    // For frame mode: prime the first frame immediately so it renders under the frosted glass
+    if (isFrameMode && targetSrc) {
+      const frameSrc = targetSrc.includes("#t=") ? targetSrc : `${targetSrc}#t=0.001`;
+      if (!video.src || !video.src.includes(targetSrc)) {
+        video.src = frameSrc;
+      }
+      video.preload = "auto";
+      video.muted = true;
+      video.playsInline = true;
+
+      const primeFirstFrame = () => {
+        try {
+          if (video.currentTime < 0.001) {
+            video.currentTime = 0.001;
+          }
+        } catch (e) {}
+
+        // In Chrome/Edge, briefly invoking play() on a muted video spins up the hardware decoder
+        // to paint the first frame onto the canvas, then immediately pausing freezes that frame.
+        if (video.paused && !card._isPlayingManual && !cover.classList.contains("previewing")) {
+          const p = video.play();
+          if (p !== undefined) {
+            p.then(() => {
+              if (!card._isPlayingManual && !cover.classList.contains("previewing")) {
+                video.pause();
+                video.currentTime = 0.001;
+              }
+            }).catch(() => {});
+          }
+        }
+      };
+
+      if (video.readyState >= 2) {
+        primeFirstFrame();
+      } else {
+        video.addEventListener("loadeddata", primeFirstFrame, { once: true });
+        video.addEventListener("loadedmetadata", primeFirstFrame, { once: true });
+      }
+    }
 
     // 1. Hover Intent (250ms delay: casual mouse sweeps over cards trigger ZERO requests!)
     const onMouseEnter = () => {
