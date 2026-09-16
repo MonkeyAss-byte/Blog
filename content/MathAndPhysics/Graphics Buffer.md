@@ -1,0 +1,2 @@
+
+GraphicsBuffer涵盖完整的ComputeBuffer类型
