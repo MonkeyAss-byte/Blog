@@ -1,0 +1,195 @@
+{
+  "9": {
+    "class_type": "Hy3D21VAEDecode",
+    "inputs": {
+      "box_v": 1.01,
+      "octree_resolution": 384,
+      "num_chunks": 128000,
+      "mc_level": 0,
+      "mc_algo": "mc",
+      "enable_flash_vdm": true,
+      "force_offload": false,
+      "vae": [
+        "4",
+        0
+      ],
+      "latents": [
+        "37",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "Hy3D21VAEDecode"
+    }
+  },
+  "19": {
+    "class_type": "Hy3D21PostprocessMesh",
+    "inputs": {
+      "remove_floaters": true,
+      "remove_degenerate_faces": true,
+      "reduce_faces": false,
+      "max_facenum": 200000,
+      "smooth_normals": false,
+      "trimesh": [
+        "9",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "Hy3D21PostprocessMesh"
+    }
+  },
+  "20": {
+    "class_type": "Hy3D21ExportMesh",
+    "inputs": {
+      "filename_prefix": "Hy21_Mesh",
+      "file_format": "glb",
+      "trimesh": [
+        "21",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "Hy3D21ExportMesh"
+    }
+  },
+  "4": {
+    "class_type": "Hy3D21VAELoader",
+    "inputs": {
+      "model_name": "hunyuan3d-vae-v2-mini-turbo\\hunyuan3d-vae-v2-mini-turbo.safetensors"
+    },
+    "_meta": {
+      "title": "Hy3D21VAELoader"
+    }
+  },
+  "21": {
+    "class_type": "Hy3D21MeshlibDecimate",
+    "inputs": {
+      "subdivideParts": 16,
+      "target_face_num": 200000,
+      "target_face_ratio": 0,
+      "strategy": "None",
+      "maxError": 0,
+      "maxEdgeLen": 0,
+      "maxBdShift": 0,
+      "maxTriangleAspectRatio": 0,
+      "criticalTriAspectRatio": 0,
+      "tinyEdgeLength": 0,
+      "stabilizer": 0,
+      "angleWeightedDistToPlane": false,
+      "optimizeVertexPos": false,
+      "collapseNearNotFlippable": false,
+      "touchNearBdEdges": false,
+      "maxAngleChange": 0,
+      "decimateBetweenParts": false,
+      "minFacesInPart": 0,
+      "trimesh": [
+        "19",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "Hy3D21MeshlibDecimate"
+    }
+  },
+  "11": {
+    "class_type": "Preview3D",
+    "inputs": {
+      "model_file": [
+        "20",
+        0
+      ],
+      "image": ""
+    },
+    "_meta": {
+      "title": "Preview3D"
+    }
+  },
+  "37": {
+    "class_type": "Hy3D21MeshGenerator",
+    "inputs": {
+      "model": "hunyuan3d-dit-v2-mini-turbo\\hunyuan3d-dit-v2-mini-turbo.safetensors",
+      "steps": 15,
+      "guidance_scale": 5.5,
+      "seed": 505338888384588,
+      "control_after_generate": "randomize",
+      "attention_mode": "sdpa",
+      "image": [
+        "54",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "Hy3D21MeshGenerator"
+    }
+  },
+  "53": {
+    "class_type": "RMBG",
+    "inputs": {
+      "model": "RMBG-2.0",
+      "sensitivity": 1,
+      "process_res": 1024,
+      "mask_blur": 0,
+      "mask_offset": 0,
+      "invert_output": false,
+      "refine_foreground": false,
+      "background": "Alpha",
+      "background_color": "#222222",
+      "image": [
+        "66",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "RMBG"
+    }
+  },
+  "54": {
+    "class_type": "PreviewImage",
+    "inputs": {
+      "images": [
+        "53",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "PreviewImage"
+    }
+  },
+  "66": {
+    "class_type": "PreviewImage",
+    "inputs": {
+      "images": [
+        "68",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "PreviewImage"
+    }
+  },
+  "67": {
+    "class_type": "SaveGLB",
+    "inputs": {
+      "filename_prefix": "3d/ComfyUI",
+      "image": "",
+      "mesh": [
+        "20",
+        2
+      ]
+    },
+    "_meta": {
+      "title": "SaveGLB"
+    }
+  },
+  "68": {
+    "class_type": "LoadImage",
+    "inputs": {
+      "image": "Albedo_0.png",
+      "upload": "image"
+    },
+    "_meta": {
+      "title": "LoadImage"
+    }
+  }
+}

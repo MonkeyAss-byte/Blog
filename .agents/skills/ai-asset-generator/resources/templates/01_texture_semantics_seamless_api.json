@@ -1,0 +1,449 @@
+{
+  "2": {
+    "class_type": "DualCLIPLoader",
+    "inputs": {
+      "clip_name1": "clip_l.safetensors",
+      "clip_name2": "t5xxl_fp8_e4m3fn.safetensors",
+      "type": "flux",
+      "device": "default"
+    },
+    "_meta": {
+      "title": "DualCLIPLoader"
+    }
+  },
+  "13": {
+    "class_type": "SaveImage",
+    "inputs": {
+      "filename_prefix": "normal",
+      "images": [
+        "21",
+        1
+      ]
+    },
+    "_meta": {
+      "title": "Normal"
+    }
+  },
+  "15": {
+    "class_type": "ChordNormalToHeight",
+    "inputs": {
+      "normal": [
+        "21",
+        1
+      ]
+    },
+    "_meta": {
+      "title": "ChordNormalToHeight"
+    }
+  },
+  "16": {
+    "class_type": "SaveImage",
+    "inputs": {
+      "filename_prefix": "height",
+      "images": [
+        "15",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "Height"
+    }
+  },
+  "17": {
+    "class_type": "SaveImage",
+    "inputs": {
+      "filename_prefix": "basecolor",
+      "images": [
+        "21",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "Basecolor"
+    }
+  },
+  "10": {
+    "class_type": "VAEDecode",
+    "inputs": {
+      "samples": [
+        "6",
+        0
+      ],
+      "vae": [
+        "27",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "VAEDecode"
+    }
+  },
+  "11": {
+    "class_type": "SaveImage",
+    "inputs": {
+      "filename_prefix": "texture_image",
+      "images": [
+        "10",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "Texture Image"
+    }
+  },
+  "5": {
+    "class_type": "ConditioningZeroOut",
+    "inputs": {
+      "conditioning": [
+        "3",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "ConditioningZeroOut"
+    }
+  },
+  "6": {
+    "class_type": "KSampler",
+    "inputs": {
+      "seed": 1069295808111094,
+      "control_after_generate": "randomize",
+      "steps": 20,
+      "cfg": 1,
+      "sampler_name": "heun",
+      "scheduler": "beta",
+      "denoise": 1,
+      "model": [
+        "24",
+        0
+      ],
+      "positive": [
+        "3",
+        0
+      ],
+      "negative": [
+        "5",
+        0
+      ],
+      "latent_image": [
+        "7",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "KSampler"
+    }
+  },
+  "1": {
+    "class_type": "UNETLoader",
+    "inputs": {
+      "unet_name": "Rayflux.v1.0_fp8.safetensors",
+      "weight_dtype": "default"
+    },
+    "_meta": {
+      "title": "UNETLoader"
+    }
+  },
+  "8": {
+    "class_type": "VAELoader",
+    "inputs": {
+      "vae_name": "ae.safetensors"
+    },
+    "_meta": {
+      "title": "VAELoader"
+    }
+  },
+  "7": {
+    "class_type": "EmptySD3LatentImage",
+    "inputs": {
+      "width": 1024,
+      "height": 1024,
+      "batch_size": 1
+    },
+    "_meta": {
+      "title": "EmptySD3LatentImage"
+    }
+  },
+  "20": {
+    "class_type": "PrimitiveStringMultiline",
+    "inputs": {
+      "value": "A flat orthographic direct-on top-down seamless texture of a clean bathhouse wall, pure glossy white ceramic subway tiles laid in a precise horizontal running bond brick pattern, identical rectangular dimensions, high-gloss glazed ceramic surface with subtle clean beveled edges, perfectly straight and level horizontal grout lines, alternating vertical joints at exact midpoints, thin clean light grey mortar joints, pristine spotless hygienic condition, neutral diffuse studio lighting, 8k"
+    },
+    "_meta": {
+      "title": "PrimitiveStringMultiline"
+    }
+  },
+  "3": {
+    "class_type": "CLIPTextEncodeFlux",
+    "inputs": {
+      "clip_l": [
+        "20",
+        0
+      ],
+      "t5xxl": [
+        "20",
+        0
+      ],
+      "guidance": 1.5,
+      "clip": [
+        "2",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "CLIPTextEncodeFlux"
+    }
+  },
+  "21": {
+    "class_type": "ChordMaterialEstimation",
+    "inputs": {
+      "chord_model": [
+        "12",
+        0
+      ],
+      "image": [
+        "10",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "ChordMaterialEstimation"
+    }
+  },
+  "12": {
+    "class_type": "ChordLoadModel",
+    "inputs": {
+      "ckpt_name": "chord_v1.safetensors"
+    },
+    "_meta": {
+      "title": "ChordLoadModel"
+    }
+  },
+  "23": {
+    "class_type": "TextureViewer",
+    "inputs": {
+      "color_map": [
+        "17",
+        0
+      ],
+      "displacement_map": [
+        "16",
+        0
+      ],
+      "normal_map": [
+        "13",
+        0
+      ],
+      "ao_map": [
+        "32",
+        0
+      ],
+      "metalness_map": [
+        "37",
+        0
+      ],
+      "roughness_map": [
+        "38",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "TextureViewer"
+    }
+  },
+  "24": {
+    "class_type": "SeamlessTileModelDiT",
+    "inputs": {
+      "tiling": "enable",
+      "seed": 51756655550767,
+      "control_after_generate": "randomize",
+      "model": [
+        "1",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "SeamlessTileModelDiT"
+    }
+  },
+  "25": {
+    "class_type": "OffsetImage",
+    "inputs": {
+      "x_percent": 50,
+      "y_percent": 50,
+      "pixels": [
+        "11",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "OffsetImage"
+    }
+  },
+  "26": {
+    "class_type": "PreviewImage",
+    "inputs": {
+      "images": [
+        "25",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "缝隙检测"
+    }
+  },
+  "27": {
+    "class_type": "MakeCircularVAEDiT",
+    "inputs": {
+      "tiling": "enable",
+      "copy_vae": "Modify in place",
+      "vae": [
+        "8",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "MakeCircularVAEDiT"
+    }
+  },
+  "28": {
+    "class_type": "PreviewImage",
+    "inputs": {
+      "images": [
+        "23",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "PreviewImage"
+    }
+  },
+  "29": {
+    "class_type": "SaveImage",
+    "inputs": {
+      "filename_prefix": "Check_Tiling",
+      "images": [
+        "26",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "Check_Tiling"
+    }
+  },
+  "30": {
+    "class_type": "SaveImage",
+    "inputs": {
+      "filename_prefix": "Check_Effect",
+      "images": [
+        "28",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "Check_Effect"
+    }
+  },
+  "32": {
+    "class_type": "TextureAOFromHeight",
+    "inputs": {
+      "strength": 2,
+      "radius_px": 12,
+      "directions": "4",
+      "wrap_edges": true,
+      "height": [
+        "15",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "TextureAOFromHeight"
+    }
+  },
+  "35": {
+    "class_type": "TextureChannelPack",
+    "inputs": {
+      "preset": "ORM (glTF)",
+      "red_fill": 1,
+      "green_fill": 1,
+      "blue_fill": 0,
+      "alpha_fill": 1,
+      "red_or_ao": [
+        "40",
+        0
+      ],
+      "green_or_roughness": [
+        "38",
+        0
+      ],
+      "blue_or_metalness": [
+        "37",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "TextureChannelPack"
+    }
+  },
+  "36": {
+    "class_type": "SaveImage",
+    "inputs": {
+      "filename_prefix": "ORM",
+      "images": [
+        "35",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "ORM"
+    }
+  },
+  "37": {
+    "class_type": "PreviewImage",
+    "inputs": {
+      "images": [
+        "21",
+        3
+      ]
+    },
+    "_meta": {
+      "title": "PreviewImage"
+    }
+  },
+  "38": {
+    "class_type": "PreviewImage",
+    "inputs": {
+      "images": [
+        "21",
+        2
+      ]
+    },
+    "_meta": {
+      "title": "PreviewImage"
+    }
+  },
+  "39": {
+    "class_type": "PreviewImage",
+    "inputs": {
+      "images": [
+        "36",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "PreviewImage"
+    }
+  },
+  "40": {
+    "class_type": "PreviewImage",
+    "inputs": {
+      "images": [
+        "32",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "PreviewImage"
+    }
+  }
+}

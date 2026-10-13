@@ -1,0 +1,467 @@
+{
+  "2": {
+    "class_type": "DualCLIPLoader",
+    "inputs": {
+      "clip_name1": "clip_l.safetensors",
+      "clip_name2": "t5xxl_fp8_e4m3fn.safetensors",
+      "type": "flux",
+      "device": "default"
+    },
+    "_meta": {
+      "title": "DualCLIPLoader"
+    }
+  },
+  "10": {
+    "class_type": "VAEDecode",
+    "inputs": {
+      "samples": [
+        "6",
+        0
+      ],
+      "vae": [
+        "27",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "VAEDecode"
+    }
+  },
+  "11": {
+    "class_type": "SaveImage",
+    "inputs": {
+      "filename_prefix": "texture_image",
+      "images": [
+        "10",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "Texture Image"
+    }
+  },
+  "5": {
+    "class_type": "ConditioningZeroOut",
+    "inputs": {
+      "conditioning": [
+        "3",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "ConditioningZeroOut"
+    }
+  },
+  "6": {
+    "class_type": "KSampler",
+    "inputs": {
+      "seed": 1075688022943339,
+      "control_after_generate": "randomize",
+      "steps": 20,
+      "cfg": 1,
+      "sampler_name": "heun",
+      "scheduler": "beta",
+      "denoise": 1,
+      "model": [
+        "24",
+        0
+      ],
+      "positive": [
+        "3",
+        0
+      ],
+      "negative": [
+        "5",
+        0
+      ],
+      "latent_image": [
+        "7",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "KSampler"
+    }
+  },
+  "1": {
+    "class_type": "UNETLoader",
+    "inputs": {
+      "unet_name": "Rayflux.v1.0_fp8.safetensors",
+      "weight_dtype": "default"
+    },
+    "_meta": {
+      "title": "UNETLoader"
+    }
+  },
+  "8": {
+    "class_type": "VAELoader",
+    "inputs": {
+      "vae_name": "ae.safetensors"
+    },
+    "_meta": {
+      "title": "VAELoader"
+    }
+  },
+  "7": {
+    "class_type": "EmptySD3LatentImage",
+    "inputs": {
+      "width": 1024,
+      "height": 1024,
+      "batch_size": 1
+    },
+    "_meta": {
+      "title": "EmptySD3LatentImage"
+    }
+  },
+  "20": {
+    "class_type": "PrimitiveStringMultiline",
+    "inputs": {
+      "value": "A top-down photographic macro texture of dried vertical water runoff stains and mineral streaks. The watermarks flow downwards with fine drip tracks and semi-transparent coffee-ring edges, concentrated in the upper-center of the frame and naturally thinning out towards the bottom. The entire stain is strictly isolated on a solid pure black background, with soft dissolving edges that never touch the canvas borders. Absolutely no surrounding walls, no bricks, and no background tiles. Orthographic flat texture scan, neutral diffuse studio lighting, zero reflections, 8k."
+    },
+    "_meta": {
+      "title": "PrimitiveStringMultiline"
+    }
+  },
+  "3": {
+    "class_type": "CLIPTextEncodeFlux",
+    "inputs": {
+      "clip_l": [
+        "20",
+        0
+      ],
+      "t5xxl": [
+        "20",
+        0
+      ],
+      "guidance": 1.5,
+      "clip": [
+        "2",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "CLIPTextEncodeFlux"
+    }
+  },
+  "12": {
+    "class_type": "ChordLoadModel",
+    "inputs": {
+      "ckpt_name": "chord_v1.safetensors"
+    },
+    "_meta": {
+      "title": "ChordLoadModel"
+    }
+  },
+  "24": {
+    "class_type": "SeamlessTileModelDiT",
+    "inputs": {
+      "tiling": "disable",
+      "seed": 669332673758467,
+      "control_after_generate": "randomize",
+      "model": [
+        "1",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "SeamlessTileModelDiT"
+    }
+  },
+  "27": {
+    "class_type": "MakeCircularVAEDiT",
+    "inputs": {
+      "tiling": "disable",
+      "copy_vae": "Modify in place",
+      "vae": [
+        "8",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "MakeCircularVAEDiT"
+    }
+  },
+  "32": {
+    "class_type": "FeatherMask",
+    "inputs": {
+      "left": 25,
+      "top": 25,
+      "right": 25,
+      "bottom": 25,
+      "mask": [
+        "88",
+        1
+      ]
+    },
+    "_meta": {
+      "title": "边缘安全衰减羽化 (25px)"
+    }
+  },
+  "43": {
+    "class_type": "SaveImage",
+    "inputs": {
+      "filename_prefix": "Decal_basecolor",
+      "images": [
+        "46",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "Basecolor"
+    }
+  },
+  "44": {
+    "class_type": "SaveImage",
+    "inputs": {
+      "filename_prefix": "Decal_normal",
+      "images": [
+        "46",
+        1
+      ]
+    },
+    "_meta": {
+      "title": "Normal"
+    }
+  },
+  "45": {
+    "class_type": "ChordNormalToHeight",
+    "inputs": {
+      "normal": [
+        "46",
+        1
+      ]
+    },
+    "_meta": {
+      "title": "ChordNormalToHeight"
+    }
+  },
+  "46": {
+    "class_type": "ChordMaterialEstimation",
+    "inputs": {
+      "chord_model": [
+        "12",
+        0
+      ],
+      "image": [
+        "11",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "ChordMaterialEstimation"
+    }
+  },
+  "47": {
+    "class_type": "TextureViewer",
+    "inputs": {
+      "color_map": [
+        "91",
+        0
+      ],
+      "displacement_map": [
+        "48",
+        0
+      ],
+      "normal_map": [
+        "44",
+        0
+      ],
+      "ao_map": [
+        "52",
+        0
+      ],
+      "metalness_map": [
+        "50",
+        0
+      ],
+      "roughness_map": [
+        "49",
+        0
+      ],
+      "alpha_map": [
+        "88",
+        2
+      ]
+    },
+    "_meta": {
+      "title": "TextureViewer"
+    }
+  },
+  "48": {
+    "class_type": "SaveImage",
+    "inputs": {
+      "filename_prefix": "height",
+      "images": [
+        "45",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "Height"
+    }
+  },
+  "49": {
+    "class_type": "PreviewImage",
+    "inputs": {
+      "images": [
+        "46",
+        2
+      ]
+    },
+    "_meta": {
+      "title": "PreviewImage"
+    }
+  },
+  "50": {
+    "class_type": "PreviewImage",
+    "inputs": {
+      "images": [
+        "46",
+        3
+      ]
+    },
+    "_meta": {
+      "title": "PreviewImage"
+    }
+  },
+  "51": {
+    "class_type": "TextureChannelPack",
+    "inputs": {
+      "preset": "ORM (glTF)",
+      "red_fill": 1,
+      "green_fill": 1,
+      "blue_fill": 0,
+      "alpha_fill": 1,
+      "red_or_ao": [
+        "93",
+        0
+      ],
+      "green_or_roughness": [
+        "49",
+        0
+      ],
+      "blue_or_metalness": [
+        "50",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "TextureChannelPack"
+    }
+  },
+  "52": {
+    "class_type": "TextureAOFromHeight",
+    "inputs": {
+      "strength": 2,
+      "radius_px": 12,
+      "directions": "4",
+      "wrap_edges": false,
+      "height": [
+        "48",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "TextureAOFromHeight"
+    }
+  },
+  "53": {
+    "class_type": "SaveImage",
+    "inputs": {
+      "filename_prefix": "Decal_ORM",
+      "images": [
+        "51",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "ORM"
+    }
+  },
+  "54": {
+    "class_type": "PreviewImage",
+    "inputs": {
+      "images": [
+        "47",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "PreviewImage"
+    }
+  },
+  "56": {
+    "class_type": "SaveImage",
+    "inputs": {
+      "filename_prefix": "Check_Decal_Effect",
+      "images": [
+        "54",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "Check_Effect"
+    }
+  },
+  "88": {
+    "class_type": "RMBG",
+    "inputs": {
+      "model": "RMBG-2.0",
+      "sensitivity": 1,
+      "process_res": 1024,
+      "mask_blur": 5,
+      "mask_offset": 0,
+      "invert_output": false,
+      "refine_foreground": false,
+      "background": "Alpha",
+      "background_color": "#222222",
+      "image": [
+        "10",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "RMBG"
+    }
+  },
+  "89": {
+    "class_type": "PreviewImage",
+    "inputs": {
+      "images": [
+        "88",
+        2
+      ]
+    },
+    "_meta": {
+      "title": "PreviewImage"
+    }
+  },
+  "91": {
+    "class_type": "JoinImageWithAlpha",
+    "inputs": {
+      "image": [
+        "43",
+        0
+      ],
+      "alpha": [
+        "32",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "JoinImageWithAlpha"
+    }
+  },
+  "93": {
+    "class_type": "PreviewImage",
+    "inputs": {
+      "images": [
+        "52",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "PreviewImage"
+    }
+  }
+}

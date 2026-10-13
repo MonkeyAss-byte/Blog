@@ -1,0 +1,59 @@
+{
+  "2": {
+    "class_type": "LoadImage",
+    "inputs": {
+      "image": "Albedo_0.png",
+      "upload": "image"
+    },
+    "_meta": {
+      "title": "LoadImage"
+    }
+  },
+  "148": {
+    "class_type": "SAM2Segment",
+    "inputs": {
+      "prompt": "screen",
+      "sam2_model": "sam2.1_hiera_base_plus",
+      "dino_model": "GroundingDINO_SwinT_OGC (694MB)",
+      "device": "Auto",
+      "threshold": 0.4,
+      "mask_blur": 0,
+      "mask_offset": 0,
+      "invert_output": false,
+      "background": "Alpha",
+      "background_color": "#222222",
+      "image": [
+        "2",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "SAM2Segment"
+    }
+  },
+  "149": {
+    "class_type": "PreviewImage",
+    "inputs": {
+      "images": [
+        "148",
+        2
+      ]
+    },
+    "_meta": {
+      "title": "PreviewImage"
+    }
+  },
+  "150": {
+    "class_type": "SaveImage",
+    "inputs": {
+      "filename_prefix": "Mask",
+      "images": [
+        "149",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "SaveImage"
+    }
+  }
+}

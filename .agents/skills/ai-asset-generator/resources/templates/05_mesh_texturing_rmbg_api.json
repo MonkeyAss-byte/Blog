@@ -1,0 +1,155 @@
+{
+  "2": {
+    "class_type": "Hy3D21MeshUVWrap",
+    "inputs": {
+      "trimesh": [
+        "16",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "Hy3D21MeshUVWrap"
+    }
+  },
+  "3": {
+    "class_type": "Hy3D21CameraConfig",
+    "inputs": {
+      "camera_azimuths": "0, 90, 180, 270, 0, 180, 45, 315",
+      "camera_elevations": "0, 0, 0, 0, 90, -90, 0, 0",
+      "view_weights": "1, 0.5, 1, 0.5, 1, 1, 0.1, 0.1",
+      "ortho_scale": 1.1000000000000003
+    },
+    "_meta": {
+      "title": "Hy3D21CameraConfig"
+    }
+  },
+  "4": {
+    "class_type": "Hy3D21LoadImageWithTransparency",
+    "inputs": {
+      "image": "Based_image_00001_.png",
+      "upload": "image"
+    },
+    "_meta": {
+      "title": "Hy3D21LoadImageWithTransparency"
+    }
+  },
+  "8": {
+    "class_type": "Preview3D",
+    "inputs": {
+      "model_file": [
+        "10",
+        3
+      ],
+      "image": ""
+    },
+    "_meta": {
+      "title": "Preview3D"
+    }
+  },
+  "9": {
+    "class_type": "Hy3D21MultiViewsGeneratorWithMetaData",
+    "inputs": {
+      "view_size": 512,
+      "steps": 10,
+      "guidance_scale": 3,
+      "texture_size": 1024,
+      "unwrap_mesh": false,
+      "seed": 923823391191604,
+      "control_after_generate": "randomize",
+      "output_name": "CRT_Monitor_PBR",
+      "trimesh": [
+        "2",
+        0
+      ],
+      "camera_config": [
+        "3",
+        0
+      ],
+      "image": [
+        "15",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "Hy3D21MultiViewsGeneratorWithMetaData"
+    }
+  },
+  "10": {
+    "class_type": "Hy3DBakeMultiViewsWithMetaData",
+    "inputs": {
+      "pipeline": [
+        "9",
+        0
+      ],
+      "albedo": [
+        "9",
+        1
+      ],
+      "mr": [
+        "9",
+        2
+      ],
+      "metadata": [
+        "9",
+        3
+      ]
+    },
+    "_meta": {
+      "title": "Hy3DBakeMultiViewsWithMetaData"
+    }
+  },
+  "15": {
+    "class_type": "RMBG",
+    "inputs": {
+      "model": "RMBG-2.0",
+      "sensitivity": 1,
+      "process_res": 1024,
+      "mask_blur": 0,
+      "mask_offset": 0,
+      "invert_output": false,
+      "refine_foreground": false,
+      "background": "Alpha",
+      "background_color": "#222222",
+      "image": [
+        "4",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "RMBG"
+    }
+  },
+  "16": {
+    "class_type": "Hy3D21LoadMesh",
+    "inputs": {
+      "glb_path": "3d/CRT_Mesh_00001_.glb"
+    },
+    "_meta": {
+      "title": "Hy3D21LoadMesh"
+    }
+  },
+  "19": {
+    "class_type": "PreviewImage",
+    "inputs": {
+      "images": [
+        "10",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "PreviewImage"
+    }
+  },
+  "20": {
+    "class_type": "PreviewImage",
+    "inputs": {
+      "images": [
+        "10",
+        1
+      ]
+    },
+    "_meta": {
+      "title": "PreviewImage"
+    }
+  }
+}

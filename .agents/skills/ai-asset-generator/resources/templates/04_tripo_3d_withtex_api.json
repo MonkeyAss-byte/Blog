@@ -1,0 +1,73 @@
+{
+  "1": {
+    "inputs": {
+      "model_version": "v2.5-20250123",
+      "texture": true,
+      "pbr": true,
+      "model_seed": 42,
+      "orientation": "default",
+      "texture_seed": 42,
+      "texture_quality": "standard",
+      "texture_alignment": "original_image",
+      "face_limit": 0,
+      "quad": false,
+      "geometry_quality": "standard",
+      "smart_low_poly": false,
+      "auto_size": true,
+      "image": [
+        "4",
+        0
+      ]
+    },
+    "class_type": "TripoImageToModelNodeV2",
+    "_meta": {
+      "title": "TripoImageToModelNodeV2"
+    }
+  },
+  "2": {
+    "inputs": {
+      "image": "front_ortho_transparent.png"
+    },
+    "class_type": "LoadImage",
+    "_meta": {
+      "title": "LoadImage"
+    }
+  },
+  "4": {
+    "inputs": {
+      "model": "RMBG-2.0",
+      "sensitivity": 1.0,
+      "process_res": 1024,
+      "mask_blur": 0,
+      "mask_offset": 0,
+      "invert_output": false,
+      "refine_foreground": false,
+      "background": "Alpha",
+      "background_color": "#222222",
+      "image": [
+        "2",
+        0
+      ]
+    },
+    "class_type": "RMBG",
+    "_meta": {
+      "title": "RMBG"
+    }
+  },
+  "6": {
+    "inputs": {
+      "filename_prefix": "3d/Tripo_p2",
+      "width": 1024,
+      "height": 1024,
+      "viewport_state": "",
+      "model_3d": [
+        "1",
+        1
+      ]
+    },
+    "class_type": "Save3DAdvanced",
+    "_meta": {
+      "title": "Save3DAdvanced"
+    }
+  }
+}
