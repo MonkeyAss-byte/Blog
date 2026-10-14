@@ -80,7 +80,7 @@
 ##### 方法
 - `CreatePipeline(this)` 
   - 核心逻辑：
-    1. `rendererdata.create()` added
+    1. `for each rendererdata.create()` added
   
 ---
 
@@ -98,8 +98,8 @@
   - **核心逻辑执行流：**
     1. `sortCameras` (深度 + 是否渲染到 RenderTexture)
     2. `RenderCameraStack(Base)`
-    3. `for x in Base.cameraStack`: 
-       - `RenderSingleCamera(x)`
+	    1. `for x in Base.cameraStack`: 
+	       - `RenderSingleCamera(x)`
 - `RenderSingleCamera(...)`
   - **核心逻辑执行流：**
     1. `TryGetCullingParameters`
